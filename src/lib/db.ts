@@ -11,7 +11,9 @@ function connectionString(): string {
   const url = process.env.DATABASE_URL;
   if (!url) {
     throw new Error(
-      "DATABASE_URL is not set. Copy .env.example to .env.local and point it at a Postgres database.",
+      "DATABASE_URL is not set. In development, copy .env.example to .env.local; " +
+        "on a deployment, set it in the platform's environment variables and redeploy — " +
+        "a build started before the variable existed will not pick it up.",
     );
   }
   return url;
