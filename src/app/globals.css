@@ -1,0 +1,139 @@
+@import "tailwindcss";
+
+/*
+ * High-contrast, sunlight-readable palette. Everything is sized for a phone
+ * held at arm's length on a tee box: 17px base text, 48px minimum tap targets.
+ */
+@theme {
+  --color-ink: #0b0f14;
+  --color-ink-soft: #3f4a57;
+  --color-paper: #ffffff;
+  --color-paper-soft: #f2f4f7;
+  --color-line: #c9d1da;
+  --color-turkey: #7c2d12;
+  --color-gravy: #b45309;
+  --color-fairway: #0f766e;
+  --color-flag: #b91c1c;
+  --color-birdie: #b91c1c;
+  --color-bogey: #1f2937;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+:root {
+  color-scheme: light;
+  --tsi-shell: var(--color-paper);
+  --tsi-text: var(--color-ink);
+  --tsi-muted: var(--color-ink-soft);
+  --tsi-panel: var(--color-paper-soft);
+  --tsi-line: var(--color-line);
+  --tsi-weight: 600;
+}
+
+/* Sunlight mode: pure black on pure white, heavier type, thicker rules. */
+:root[data-sun="on"] {
+  --tsi-shell: #ffffff;
+  --tsi-text: #000000;
+  --tsi-muted: #1a1a1a;
+  --tsi-panel: #ffffff;
+  --tsi-line: #000000;
+  --tsi-weight: 800;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--tsi-shell);
+  color: var(--tsi-text);
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 1.4;
+  font-weight: 450;
+  -webkit-font-smoothing: antialiased;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+:root[data-sun="on"] body {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+@layer components {
+  .tsi-panel {
+    background: var(--tsi-panel);
+    border: 2px solid var(--tsi-line);
+    border-radius: 14px;
+  }
+  .tsi-muted {
+    color: var(--tsi-muted);
+  }
+  .tsi-tap {
+    min-height: 48px;
+    min-width: 48px;
+  }
+  .tsi-btn {
+    min-height: 52px;
+    border-radius: 12px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0 1.1rem;
+    border: 2px solid var(--tsi-line);
+    background: var(--tsi-shell);
+    color: var(--tsi-text);
+    text-align: center;
+  }
+  .tsi-btn-primary {
+    background: var(--color-ink);
+    border-color: var(--color-ink);
+    color: #fff;
+  }
+  :root[data-sun="on"] .tsi-btn-primary {
+    background: #000;
+    border-color: #000;
+  }
+  .tsi-btn-danger {
+    border-color: var(--color-flag);
+    color: var(--color-flag);
+  }
+  .tsi-field {
+    width: 100%;
+    min-height: 52px;
+    border: 2px solid var(--tsi-line);
+    border-radius: 12px;
+    padding: 0 0.85rem;
+    background: var(--tsi-shell);
+    color: var(--tsi-text);
+    font-size: 17px;
+    font-weight: 600;
+  }
+  .tsi-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--tsi-muted);
+    margin-bottom: 6px;
+  }
+  .tsi-num {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Horizontal scrollers (scorecards) keep the page itself from scrolling sideways. */
+.tsi-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
