@@ -37,8 +37,8 @@ export default async function ScoreIndexPage() {
         {rounds.map(({ round, matches }) => (
           <Panel key={round.id}>
             <div className="mb-3 flex items-baseline justify-between gap-2">
-              <h2 className="text-lg font-black">{round.name}</h2>
-              <span className="text-xs font-extrabold uppercase tracking-widest tsi-muted">
+              <h2 className="text-lg font-bold">{round.name}</h2>
+              <span className="text-[13px] tsi-muted">
                 {round.status}
               </span>
             </div>
@@ -52,7 +52,7 @@ export default async function ScoreIndexPage() {
                   <li key={match.id}>
                     <Link
                       href={`/score/${match.id}`}
-                      className="block rounded-xl border-2 px-3 py-3"
+                      className="block rounded-xl tsi-rule px-3 py-3"
                       style={{
                         borderColor: mine ? "var(--color-turkey)" : "var(--tsi-line)",
                         borderWidth: mine ? 3 : 2,
@@ -68,7 +68,7 @@ export default async function ScoreIndexPage() {
                           {match.name}
                           {mine ? " · your match" : ""}
                         </span>
-                        <span className="text-sm font-black">{match.state.status}</span>
+                        <span className="text-sm font-bold">{match.state.status}</span>
                       </span>
                     </Link>
                   </li>

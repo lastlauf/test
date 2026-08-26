@@ -86,23 +86,24 @@ export default function Bets({
 
   return (
     <div className="space-y-4">
-      <p className="text-xs font-bold uppercase tracking-widest tsi-muted">
-        {roundName} · {online ? "● Live" : "○ Offline"} · calculation only, no money moves
+      <p className="text-[13px] tsi-muted">
+        {online ? "Live" : "Offline"} · the ledger calculates balances only
       </p>
 
       <Panel>
-        <h2 className="mb-3 text-lg font-black">Who owes whom</h2>
+        <h2 className="mb-3 text-[17px] font-bold">Who owes whom</h2>
         {ledger.settlements.length === 0 ? (
           <p className="font-semibold tsi-muted">Nothing settled yet.</p>
         ) : (
           <ul className="space-y-2">
             {ledger.settlements.map((row, i) => (
               <li key={i} className="flex items-center justify-between gap-3">
-                <span className="min-w-0 truncate font-bold">
+                <span className="min-w-0 truncate text-[15px] font-semibold">
                   {name(ledger.players[row.from])}{" "}
-                  <span className="tsi-muted">pays</span> {name(ledger.players[row.to])}
+                  <span className="font-normal tsi-muted">pays</span>{" "}
+                  {name(ledger.players[row.to])}
                 </span>
-                <span className="tsi-num shrink-0 text-lg font-black">
+                <span className="tsi-num shrink-0 text-[17px] font-bold">
                   {money(row.amount)}
                 </span>
               </li>
@@ -110,18 +111,16 @@ export default function Bets({
           </ul>
         )}
         {ledger.balances.length > 0 && (
-          <div className="mt-4 border-t-2 pt-3" style={{ borderColor: "var(--tsi-line)" }}>
-            <h3 className="mb-2 text-xs font-black uppercase tracking-widest tsi-muted">
-              Net position
-            </h3>
+          <div className="mt-4 tsi-rule-t pt-3">
+            <h3 className="mb-2 text-[13px] tsi-muted">Net position</h3>
             <ul className="space-y-1">
               {ledger.balances.map((row) => (
                 <li key={row.playerId} className="flex items-center justify-between gap-3">
-                  <span className="truncate font-bold">
+                  <span className="truncate text-[15px]">
                     {ledger.players[row.playerId] ?? "?"}
                   </span>
                   <span
-                    className="tsi-num shrink-0 font-black"
+                    className="tsi-num shrink-0 text-[15px] font-semibold"
                     style={{ color: row.amount < 0 ? "var(--color-flag)" : "var(--color-fairway)" }}
                   >
                     {money(row.amount)}
@@ -136,13 +135,12 @@ export default function Bets({
       {ledger.results.map((result) => (
         <Panel key={result.wagerId}>
           <div className="mb-2 flex items-start justify-between gap-3">
-            <h2 className="text-base font-black">{result.title}</h2>
+            <h2 className="text-[15px] font-bold">{result.title}</h2>
             {canEdit && (
               <button
                 type="button"
                 onClick={() => remove(result.wagerId)}
-                className="shrink-0 text-xs font-black uppercase tracking-widest"
-                style={{ color: "var(--color-flag)" }}
+                className="shrink-0 text-[13px] tsi-muted"
               >
                 Remove
               </button>
@@ -150,15 +148,13 @@ export default function Bets({
           </div>
           <ul className="space-y-1">
             {result.lines.map((line, i) => (
-              <li key={i} className="text-sm font-semibold">
+              <li key={i} className="text-[14px] tsi-muted">
                 {line}
               </li>
             ))}
           </ul>
           {result.pending && (
-            <p className="mt-2 text-xs font-bold uppercase tracking-widest tsi-muted">
-              Still running
-            </p>
+            <p className="mt-2 text-[13px] tsi-muted">Still running</p>
           )}
         </Panel>
       ))}
@@ -171,17 +167,18 @@ export default function Bets({
 
       {canEdit && (
         <Panel className="space-y-3">
-          <h2 className="text-lg font-black">Add a bet</h2>
-          <div className="grid grid-cols-3 gap-1 rounded-xl border-2 p-1" style={{ borderColor: "var(--tsi-line)" }}>
+          <h2 className="text-[17px] font-bold">Add a bet</h2>
+          <div className="grid grid-cols-3 gap-1 rounded-xl tsi-rule p-1">
             {(["nassau", "skins", "h2h"] as WagerType[]).map((option) => (
               <button
                 key={option}
                 type="button"
                 onClick={() => setType(option)}
-                className="tsi-tap rounded-lg text-sm font-black"
+                className="tsi-tap rounded-lg text-[14px]"
                 style={{
-                  background: type === option ? "var(--color-ink)" : "transparent",
-                  color: type === option ? "#fff" : "var(--tsi-text)",
+                  background: type === option ? "var(--tsi-text)" : "transparent",
+                  color: type === option ? "var(--tsi-shell)" : "var(--tsi-text)",
+                  fontWeight: type === option ? 700 : 500,
                 }}
               >
                 {WAGER_LABEL[option]}
@@ -239,11 +236,12 @@ export default function Bets({
                       key={player.id}
                       type="button"
                       onClick={() => toggle(player.id)}
-                      className="tsi-tap rounded-xl border-2 px-3 text-sm font-black"
+                      className="rounded-full tsi-rule px-3 py-2 text-[14px]"
                       style={{
-                        borderColor: on ? "var(--color-ink)" : "var(--tsi-line)",
-                        background: on ? "var(--color-ink)" : "transparent",
-                        color: on ? "#fff" : "var(--tsi-text)",
+                        borderColor: on ? "var(--tsi-text)" : "var(--tsi-line)",
+                        background: on ? "var(--tsi-text)" : "transparent",
+                        color: on ? "var(--tsi-shell)" : "var(--tsi-text)",
+                        fontWeight: on ? 600 : 500,
                       }}
                       aria-pressed={on}
                     >
@@ -257,7 +255,7 @@ export default function Bets({
 
           {type === "skins" && (
             <div className="flex flex-wrap items-center gap-4">
-              <label className="flex items-center gap-2 font-bold">
+              <label className="flex items-center gap-2 text-[15px]">
                 <input
                   type="checkbox"
                   className="h-6 w-6"
@@ -266,7 +264,7 @@ export default function Bets({
                 />
                 Net skins
               </label>
-              <label className="flex items-center gap-2 font-bold">
+              <label className="flex items-center gap-2 text-[15px]">
                 <input
                   type="checkbox"
                   className="h-6 w-6"
@@ -279,7 +277,7 @@ export default function Bets({
           )}
 
           {error && (
-            <p className="font-bold" style={{ color: "var(--color-flag)" }}>
+            <p className="text-[14px] font-semibold" style={{ color: "var(--color-flag)" }}>
               {error}
             </p>
           )}

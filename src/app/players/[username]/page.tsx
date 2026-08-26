@@ -46,7 +46,7 @@ export default async function PlayerProfilePage({
         title={player.display_name}
         action={
           me?.id === player.id ? (
-            <Link href="/me" className="text-sm font-bold underline">
+            <Link href="/me" className="text-[14px] font-semibold">
               Edit
             </Link>
           ) : null
@@ -57,7 +57,7 @@ export default async function PlayerProfilePage({
         <Panel className="flex items-center gap-4">
           <Avatar name={player.display_name} photo={player.photo} size={72} />
           <div className="min-w-0">
-            <p className="tsi-num text-lg font-black">
+            <p className="tsi-num text-[19px] font-bold">
               Index {player.handicap_index.toFixed(1)}
             </p>
             <p className="text-sm font-bold tsi-muted">
@@ -85,22 +85,22 @@ export default async function PlayerProfilePage({
           <Stat
             label="Win %"
             value={overallPct == null ? "—" : `${overallPct.toFixed(0)}%`}
-            sub="halves count ½"
+            sub="halves = ½"
           />
           <Stat label="Titles" value={record.championships} sub="TSI wins" />
         </div>
 
         <Panel>
-          <h2 className="mb-3 text-lg font-black">By format</h2>
+          <h2 className="mb-3 text-[17px] font-bold">By format</h2>
           <ul className="space-y-2">
             {(Object.keys(record.byFormat) as Format[]).map((format) => {
               const value = record.byFormat[format];
               const pct = winPercent(value);
               return (
                 <li key={format} className="flex items-center justify-between gap-3">
-                  <span className="font-bold">{FORMAT_LABEL[format]}</span>
+                  <span className="text-[15px]">{FORMAT_LABEL[format]}</span>
                   <span className="text-right">
-                    <span className="tsi-num block font-black">
+                    <span className="tsi-num block font-bold">
                       {value.wins}-{value.losses}
                       {value.halves ? `-${value.halves}` : ""}
                     </span>
@@ -115,14 +115,14 @@ export default async function PlayerProfilePage({
         </Panel>
 
         <Panel>
-          <h2 className="mb-3 text-lg font-black">Head to head</h2>
+          <h2 className="mb-3 text-[17px] font-bold">Head to head</h2>
           <ul className="space-y-1">
             {record.headToHead.map((row) => (
               <li key={row.opponentId} className="flex items-center justify-between gap-3 py-1">
-                <Link href={`/players/${row.opponentUsername}`} className="truncate font-bold">
+                <Link href={`/players/${row.opponentUsername}`} className="truncate text-[15px]">
                   {row.opponentName}
                 </Link>
-                <span className="tsi-num shrink-0 font-black">
+                <span className="tsi-num shrink-0 text-[15px] font-bold">
                   {row.wins}-{row.losses}
                   {row.halves ? `-${row.halves}` : ""}
                 </span>
@@ -136,12 +136,12 @@ export default async function PlayerProfilePage({
 
         {record.partners.length > 0 && (
           <Panel>
-            <h2 className="mb-3 text-lg font-black">Partners</h2>
+            <h2 className="mb-3 text-[17px] font-bold">Partners</h2>
             <ul className="space-y-1">
               {record.partners.map((row) => (
                 <li key={row.playerId} className="flex items-center justify-between gap-3 py-1">
-                  <span className="truncate font-bold">{row.name}</span>
-                  <span className="tsi-num shrink-0 font-black">
+                  <span className="truncate text-[15px]">{row.name}</span>
+                  <span className="tsi-num shrink-0 text-[15px] font-bold">
                     {row.wins}-{row.losses}
                     {row.halves ? `-${row.halves}` : ""}
                   </span>

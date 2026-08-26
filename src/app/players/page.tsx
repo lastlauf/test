@@ -22,23 +22,22 @@ export default async function PlayersPage() {
             return (
               <li
                 key={player.id}
-                className="border-b-2 last:border-b-0"
-                style={{ borderColor: "var(--tsi-line)" }}
-              >
+                className="tsi-rule-b last:border-b-0"
+                              >
                 <Link
                   href={`/players/${player.username}`}
                   className="flex items-center gap-3 px-3 py-3"
                 >
                   <Avatar name={player.display_name} photo={player.photo} />
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate font-black">{player.display_name}</span>
+                    <span className="block truncate text-[15px] font-semibold">{player.display_name}</span>
                     <span className="block text-xs font-bold tsi-muted">
                       Index {player.handicap_index.toFixed(1)}
                       {player.member_since ? ` · since ${player.member_since}` : ""}
                     </span>
                   </span>
                   <span className="shrink-0 text-right">
-                    <span className="tsi-num block font-black">
+                    <span className="tsi-num block text-[15px] font-bold">
                       {record.overall.wins}-{record.overall.losses}
                       {record.overall.halves ? `-${record.overall.halves}` : ""}
                     </span>

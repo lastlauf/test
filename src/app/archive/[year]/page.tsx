@@ -37,7 +37,7 @@ export default async function ArchiveYearPage({
         kicker={tournament.status === "complete" ? "Final" : tournament.status}
         title={tournament.name}
         action={
-          <Link href="/archive" className="text-sm font-bold underline">
+          <Link href="/archive" className="text-[14px] font-semibold">
             All years
           </Link>
         }
@@ -48,11 +48,11 @@ export default async function ArchiveYearPage({
           {teams.map((team) => (
             <span key={team.teamId} className="flex items-center gap-2">
               <TeamPill name={team.name} color={team.color} />
-              <span className="tsi-num text-2xl font-black">{team.points}</span>
+              <span className="tsi-num text-2xl font-bold">{team.points}</span>
             </span>
           ))}
           {tournament.champion && (
-            <span className="ml-auto text-sm font-black">🏆 {tournament.champion}</span>
+            <span className="ml-auto text-sm font-bold">🏆 {tournament.champion}</span>
           )}
         </Panel>
 
@@ -81,8 +81,8 @@ export default async function ArchiveYearPage({
           return (
             <Panel key={round.id} className="space-y-4">
               <div className="flex items-baseline justify-between gap-2">
-                <h2 className="text-lg font-black">{round.name}</h2>
-                <span className="text-xs font-extrabold uppercase tracking-widest tsi-muted">
+                <h2 className="text-lg font-bold">{round.name}</h2>
+                <span className="text-[13px] tsi-muted">
                   {FORMAT_LABEL[round.format]}
                 </span>
               </div>
@@ -93,7 +93,7 @@ export default async function ArchiveYearPage({
                       {sideName(match.sides[0])} <span className="tsi-muted">v</span>{" "}
                       {sideName(match.sides[1])}
                     </span>
-                    <span className="shrink-0 font-black">{match.state.status}</span>
+                    <span className="shrink-0 font-bold">{match.state.status}</span>
                   </p>
                   <Scorecard match={match} holes={bundle?.holes ?? []} />
                 </div>

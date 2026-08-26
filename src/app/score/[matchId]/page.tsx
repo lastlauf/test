@@ -32,7 +32,7 @@ export default async function ScoreMatchPage({
         kicker={bundle.round.name}
         title={match.name}
         action={
-          <Link href="/score" className="text-sm font-bold underline">
+          <Link href="/score" className="text-[14px] font-semibold">
             All matches
           </Link>
         }

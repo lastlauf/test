@@ -4,11 +4,15 @@ import Link from "next/link";
 import type { BoardPayload } from "@/lib/payloads";
 import { sideName } from "@/lib/scoring";
 import { useLive } from "./useLive";
-import { Panel } from "./ui";
+import { Panel, TeamDot } from "./ui";
 
 function toPar(value: number, holes: number) {
   if (holes === 0) return "—";
   return value === 0 ? "E" : value > 0 ? `+${value}` : `${value}`;
+}
+
+function titleCase(value: string) {
+  return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
 export default function LiveTournament({
@@ -31,128 +35,123 @@ export default function LiveTournament({
 
   const myMatch = myPlayerId
     ? rounds
-        .flatMap((r) => r.matches.map((m) => ({ ...m, roundId: r.round.id })))
-        .find((m) => m.sides.some((s) => s.players.some((p) => p.id === myPlayerId)) && !m.decided)
+        .flatMap((r) => r.matches)
+        .find(
+          (m) => m.sides.some((s) => s.players.some((p) => p.id === myPlayerId)) && !m.decided,
+        )
     : undefined;
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between gap-2 text-xs font-bold uppercase tracking-widest tsi-muted">
+    <div className="space-y-5">
+      <p className="flex items-center justify-between gap-2 text-[13px] tsi-muted">
         <span>
-          {online ? "● Live" : "○ Offline — showing last known"}
-          {updatedAt && online ? ` · ${updatedAt.toLocaleTimeString()}` : ""}
+          {online
+            ? `Live${updatedAt ? ` · updated ${updatedAt.toLocaleTimeString()}` : ""}`
+            : "Offline — showing the last scores this phone saw"}
         </span>
-        <Link href={`/leaderboard?t=${tournament.id}`} className="underline">
+        <Link href={`/leaderboard?t=${tournament.id}`} className="font-semibold">
           Full board
         </Link>
-      </div>
+      </p>
 
       {teams.length === 2 && (
-        <Panel className="!p-0 overflow-hidden">
-          <div className="grid grid-cols-[1fr_auto_1fr] items-stretch">
-            <div className="p-4" style={{ background: teams[0].color, color: "#fff" }}>
-              <p className="text-xs font-extrabold uppercase tracking-[0.16em] opacity-90">
-                {teams[0].name}
-              </p>
-              <p className="tsi-num text-5xl font-black leading-none">{teams[0].points}</p>
-            </div>
-            <div
-              className="grid place-items-center px-3 text-sm font-black"
-              style={{ background: "var(--tsi-shell)" }}
-            >
-              vs
-            </div>
-            <div
-              className="p-4 text-right"
-              style={{ background: teams[1].color, color: "#fff" }}
-            >
-              <p className="text-xs font-extrabold uppercase tracking-[0.16em] opacity-90">
-                {teams[1].name}
-              </p>
-              <p className="tsi-num text-5xl font-black leading-none">{teams[1].points}</p>
-            </div>
+        <Panel className="!py-5">
+          <div className="flex items-center justify-between gap-3">
+            {[teams[0], teams[1]].map((team, i) => (
+              <div key={team.teamId} className={i === 1 ? "text-right" : ""}>
+                <p
+                  className={`mb-1 flex items-center gap-1.5 text-[13px] font-semibold tsi-muted ${
+                    i === 1 ? "flex-row-reverse" : ""
+                  }`}
+                >
+                  <TeamDot color={team.color} />
+                  {team.name}
+                </p>
+                <p className="tsi-num text-[40px] font-extrabold leading-none">
+                  {team.points}
+                </p>
+              </div>
+            ))}
           </div>
         </Panel>
       )}
 
       {myMatch && (
-        <Link
-          href={`/score/${myMatch.id}`}
-          className="tsi-btn tsi-btn-primary w-full text-base"
-        >
-          ✎ Enter scores — {myMatch.name}
+        <Link href={`/score/${myMatch.id}`} className="tsi-btn tsi-btn-primary w-full">
+          Enter scores — {myMatch.name}
         </Link>
       )}
 
       {liveRound && (
-        <Panel>
-          <div className="mb-3 flex items-baseline justify-between gap-2">
-            <h2 className="text-lg font-black">{liveRound.round.name}</h2>
-            <span className="text-xs font-extrabold uppercase tracking-widest tsi-muted">
-              {liveRound.round.format}
-            </span>
+        <section>
+          <div className="mb-2 flex items-baseline justify-between gap-2">
+            <h2 className="text-[17px] font-bold">{liveRound.round.name}</h2>
+            <span className="text-[13px] tsi-muted">{titleCase(liveRound.round.format)}</span>
           </div>
-          <ul className="space-y-2">
-            {liveRound.matches.map((match) => (
-              <li key={match.id}>
-                <Link
-                  href={`/score/${match.id}`}
-                  className="block rounded-xl border-2 px-3 py-3"
-                  style={{ borderColor: "var(--tsi-line)" }}
-                >
-                  <span className="block truncate font-bold">
-                    {sideName(match.sides[0])}
-                    <span className="tsi-muted"> v </span>
-                    {sideName(match.sides[1])}
-                  </span>
-                  <span className="mt-0.5 flex items-baseline justify-between gap-2">
-                    <span className="text-xs font-semibold tsi-muted">{match.name}</span>
-                    <span className="text-sm font-black">{match.status}</span>
-                  </span>
-                </Link>
-              </li>
-            ))}
-            {liveRound.matches.length === 0 && (
-              <li className="tsi-muted font-semibold">No pairings set yet.</li>
-            )}
-          </ul>
-        </Panel>
+          <Panel className="!p-0">
+            <ul>
+              {liveRound.matches.map((match, i) => (
+                <li key={match.id} className={i > 0 ? "tsi-rule-t" : ""}>
+                  <Link href={`/score/${match.id}`} className="block px-4 py-3">
+                    <span className="block truncate text-[15px] font-semibold">
+                      {sideName(match.sides[0])}
+                      <span className="tsi-muted"> v </span>
+                      {sideName(match.sides[1])}
+                    </span>
+                    <span className="mt-0.5 flex items-baseline justify-between gap-3 text-[13px]">
+                      <span className="tsi-muted">{match.name}</span>
+                      <span className="font-semibold">{match.status}</span>
+                    </span>
+                  </Link>
+                </li>
+              ))}
+              {liveRound.matches.length === 0 && (
+                <li className="px-4 py-3 text-[15px] tsi-muted">No pairings set yet.</li>
+              )}
+            </ul>
+          </Panel>
+        </section>
       )}
 
-      <Panel>
-        <div className="mb-3 flex items-baseline justify-between">
-          <h2 className="text-lg font-black">Net leaderboard</h2>
-          <Link href={`/leaderboard?t=${tournament.id}`} className="text-sm font-bold underline">
+      <section>
+        <div className="mb-2 flex items-baseline justify-between">
+          <h2 className="text-[17px] font-bold">Net leaderboard</h2>
+          <Link
+            href={`/leaderboard?t=${tournament.id}`}
+            className="text-[13px] font-semibold tsi-muted"
+          >
             All {leaderboard.length}
           </Link>
         </div>
-        <ol className="space-y-1">
-          {leaderboard.slice(0, 5).map((row, i) => (
-            <li key={row.playerId} className="flex items-center gap-3 py-1">
-              <span className="tsi-num w-6 text-right font-black">{i + 1}</span>
-              <Link href={`/players/${row.username}`} className="flex min-w-0 flex-1 items-center gap-2">
-                {row.teamColor && (
-                  <span
-                    aria-label={row.teamName ?? undefined}
-                    className="h-3 w-3 shrink-0 rounded-full"
-                    style={{ background: row.teamColor }}
-                  />
-                )}
-                <span className="truncate font-bold">{row.displayName}</span>
-              </Link>
-              <span className="tsi-num w-14 text-right font-black">
-                {toPar(row.netToPar, row.holesPlayed)}
-              </span>
-              <span className="tsi-num w-12 text-right text-sm tsi-muted">
-                {row.holesPlayed}h
-              </span>
-            </li>
-          ))}
-          {leaderboard.length === 0 && (
-            <li className="tsi-muted font-semibold">No scores posted yet.</li>
-          )}
-        </ol>
-      </Panel>
+        <Panel className="!p-0">
+          <ol>
+            {leaderboard.slice(0, 5).map((row, i) => (
+              <li
+                key={row.playerId}
+                className={`flex items-center gap-3 px-4 py-2.5 ${i > 0 ? "tsi-rule-t" : ""}`}
+              >
+                <span className="tsi-num w-4 text-right text-[15px] tsi-muted">{i + 1}</span>
+                <Link
+                  href={`/players/${row.username}`}
+                  className="flex min-w-0 flex-1 items-center gap-2"
+                >
+                  <TeamDot color={row.teamColor} />
+                  <span className="truncate text-[15px] font-semibold">{row.displayName}</span>
+                </Link>
+                <span className="tsi-num w-12 text-right text-[17px] font-bold">
+                  {toPar(row.netToPar, row.holesPlayed)}
+                </span>
+                <span className="tsi-num w-10 text-right text-[13px] tsi-muted">
+                  {row.holesPlayed}h
+                </span>
+              </li>
+            ))}
+            {leaderboard.length === 0 && (
+              <li className="px-4 py-3 text-[15px] tsi-muted">No scores posted yet.</li>
+            )}
+          </ol>
+        </Panel>
+      </section>
     </div>
   );
 }

@@ -83,6 +83,10 @@ export interface Ledger {
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
 
+/** $20 rather than $20.00; cents only when they exist. */
+const money = (n: number) =>
+  `$${n.toFixed(2).replace(/\.00$/, "")}`;
+
 /** Split `amount` from each loser to each winner, keeping the pot at `amount`. */
 function splitTransfers(
   losers: string[],
@@ -191,7 +195,7 @@ function nassauResult(
     const winners = state.differential > 0 ? teamA : teamB;
     const losers = state.differential > 0 ? teamB : teamA;
     lines.push(
-      `${segment.label}: ${sideLabel(state.differential > 0 ? a : b)} wins ${Math.abs(state.differential)} up — $${wager.amount.toFixed(2)}`,
+      `${segment.label}: ${sideLabel(state.differential > 0 ? a : b)} wins ${Math.abs(state.differential)} up — ${money(wager.amount)}`,
     );
     transfers.push(
       ...splitTransfers(losers, winners, wager.amount, `Nassau ${segment.label}`),
@@ -201,7 +205,7 @@ function nassauResult(
   return {
     wagerId: wager.id,
     type: "nassau",
-    title: `Nassau — ${match.name} ($${wager.amount.toFixed(2)} a side)`,
+    title: `Nassau · ${match.name} · ${money(wager.amount)} a side`,
     lines,
     transfers,
     pending,
@@ -281,7 +285,7 @@ function skinsResult(wager: WagerDef, ctx: LedgerContext): WagerResult {
       const winner = winners[0];
       const losers = participants.filter((id) => id !== winner);
       lines.push(
-        `Hole ${hole.number}: ${name(ctx, winner)} wins ${carry > 1 ? `${carry} skins` : "a skin"} with ${useNet ? "net" : "gross"} ${best} — $${(value * losers.length).toFixed(2)}`,
+        `Hole ${hole.number}: ${name(ctx, winner)} wins ${carry > 1 ? `${carry} skins` : "a skin"} with ${useNet ? "net" : "gross"} ${best} — ${money(value * losers.length)}`,
       );
       for (const loser of losers) {
         transfers.push({
@@ -304,7 +308,7 @@ function skinsResult(wager: WagerDef, ctx: LedgerContext): WagerResult {
   return {
     wagerId: wager.id,
     type: "skins",
-    title: `Skins — $${wager.amount.toFixed(2)} per player, per skin (${useNet ? "net" : "gross"}${carryover ? ", carryover" : ""})`,
+    title: `Skins · ${money(wager.amount)} a skin, per player · ${useNet ? "net" : "gross"}${carryover ? ", carryover" : ""}`,
     lines,
     transfers,
     pending,
@@ -347,7 +351,7 @@ function h2hResult(wager: WagerDef, ctx: LedgerContext): WagerResult {
     const winner = differential > 0 ? a : b;
     const loser = differential > 0 ? b : a;
     lines.push(
-      `${name(ctx, winner)} beats ${name(ctx, loser)} ${Math.abs(differential)}${remaining > 0 ? `&${remaining}` : " up"} — $${wager.amount.toFixed(2)}`,
+      `${name(ctx, winner)} beats ${name(ctx, loser)} ${Math.abs(differential)}${remaining > 0 ? `&${remaining}` : " up"} — ${money(wager.amount)}`,
     );
     transfers.push({
       from: loser,
@@ -359,7 +363,7 @@ function h2hResult(wager: WagerDef, ctx: LedgerContext): WagerResult {
   return {
     wagerId: wager.id,
     type: "h2h",
-    title: `Head-to-head — ${name(ctx, a)} vs ${name(ctx, b)} ($${wager.amount.toFixed(2)})`,
+    title: `Head to head · ${name(ctx, a)} v ${name(ctx, b)} · ${money(wager.amount)}`,
     lines,
     transfers,
     pending: !decided && remaining > 0,

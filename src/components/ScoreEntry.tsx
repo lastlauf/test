@@ -68,13 +68,13 @@ function Stepper({
         type="button"
         aria-label={`${label} down`}
         onClick={() => step(-1)}
-        className="tsi-tap rounded-xl border-2 text-2xl font-black"
+        className="tsi-tap rounded-xl tsi-rule text-2xl font-bold"
         style={{ borderColor: "var(--tsi-line)", width: big ? 52 : 44, height: big ? 52 : 44 }}
       >
         −
       </button>
       <span
-        className="tsi-num grid place-items-center font-black"
+        className="tsi-num grid place-items-center font-bold"
         style={{
           width: big ? 56 : 40,
           fontSize: big ? 30 : 20,
@@ -88,13 +88,17 @@ function Stepper({
         type="button"
         aria-label={`${label} up`}
         onClick={() => step(1)}
-        className="tsi-tap rounded-xl border-2 text-2xl font-black"
+        className="tsi-tap rounded-xl tsi-rule text-2xl font-bold"
         style={{ borderColor: "var(--tsi-line)", width: big ? 52 : 44, height: big ? 52 : 44 }}
       >
         +
       </button>
     </div>
   );
+}
+
+function titleCase(value: string) {
+  return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
 export default function ScoreEntry({
@@ -291,15 +295,13 @@ export default function ScoreEntry({
   return (
     <div className="space-y-4">
       <Panel className="!py-3">
-        <p className="truncate text-sm font-black">
+        <p className="truncate text-[15px] font-semibold">
           {sideName(match.sides[0])} <span className="tsi-muted">v</span>{" "}
           {sideName(match.sides[1])}
         </p>
-        <div className="mt-1 flex items-baseline justify-between gap-2">
-          <p className="text-xs font-bold uppercase tracking-widest tsi-muted">
-            {match.format}
-          </p>
-          <p className="text-sm font-black">{localState.status}</p>
+        <div className="mt-0.5 flex items-baseline justify-between gap-3 text-[13px]">
+          <span className="tsi-muted">{titleCase(match.format)}</span>
+          <span className="font-semibold">{localState.status}</span>
         </div>
       </Panel>
 
@@ -315,28 +317,32 @@ export default function ScoreEntry({
       )}
 
       {/* Hole picker */}
-      <div className="flex items-center gap-2">
+      <div className="tsi-panel flex items-center justify-between px-2 py-3">
         <button
           type="button"
-          className="tsi-btn !min-h-[64px] !w-16 text-2xl"
+          className="tsi-tap rounded-xl text-2xl"
           onClick={() => setHole((h) => Math.max(1, h - 1))}
           aria-label="Previous hole"
+          style={{ color: hole === 1 ? "var(--tsi-line)" : "var(--tsi-text)" }}
         >
           ‹
         </button>
-        <div className="tsi-panel flex-1 px-3 py-2 text-center">
-          <p className="text-xs font-extrabold uppercase tracking-[0.18em] tsi-muted">Hole</p>
-          <p className="tsi-num text-4xl font-black leading-none">{hole}</p>
-          <p className="text-xs font-bold tsi-muted">
+        <div className="text-center">
+          <p className="text-[12px] tsi-muted">Hole</p>
+          <p className="tsi-num text-[38px] font-extrabold leading-none">{hole}</p>
+          <p className="mt-1 text-[13px] tsi-muted">
             Par {current?.par ?? "–"} · SI {current?.strokeIndex ?? "–"}
             {current?.yardage ? ` · ${current.yardage} yds` : ""}
           </p>
         </div>
         <button
           type="button"
-          className="tsi-btn !min-h-[64px] !w-16 text-2xl"
+          className="tsi-tap rounded-xl text-2xl"
           onClick={() => setHole((h) => Math.min(holes.length, h + 1))}
           aria-label="Next hole"
+          style={{
+            color: hole === holes.length ? "var(--tsi-line)" : "var(--tsi-text)",
+          }}
         >
           ›
         </button>
@@ -352,12 +358,11 @@ export default function ScoreEntry({
                 key={h.number}
                 type="button"
                 onClick={() => setHole(h.number)}
-                className="tsi-num h-9 w-9 shrink-0 rounded-lg border-2 text-sm font-black"
+                className="tsi-num h-9 w-9 shrink-0 rounded-full text-[14px]"
                 style={{
-                  borderColor: active ? "var(--color-turkey)" : "var(--tsi-line)",
-                  background: active ? "var(--color-turkey)" : done ? "var(--tsi-panel)" : "transparent",
-                  color: active ? "#fff" : "var(--tsi-text)",
-                  opacity: done || active ? 1 : 0.7,
+                  background: active ? "var(--tsi-text)" : done ? "var(--tsi-fill)" : "transparent",
+                  color: active ? "var(--tsi-shell)" : done ? "var(--tsi-text)" : "var(--tsi-muted)",
+                  fontWeight: active || done ? 700 : 500,
                 }}
                 aria-label={`Go to hole ${h.number}`}
               >
@@ -380,15 +385,14 @@ export default function ScoreEntry({
           return (
             <div
               key={`${subject.type}:${subject.id}`}
-              className="border-b-2 pb-3 last:border-b-0 last:pb-0"
-              style={{ borderColor: "var(--tsi-line)" }}
-            >
+              className="tsi-rule-b pb-3 last:border-b-0 last:pb-0"
+                          >
               <div className="mb-2 flex items-center justify-between gap-2">
-                <p className="min-w-0 truncate font-black">
+                <p className="min-w-0 truncate text-[16px] font-semibold">
                   {subject.label}
                   {strokes > 0 && (
                     <span
-                      className="ml-2 align-middle text-xs font-black"
+                      className="ml-2 align-middle text-xs font-bold"
                       style={{ color: "var(--color-flag)" }}
                       title={`${strokes} stroke${strokes === 1 ? "" : "s"} on this hole`}
                     >
@@ -396,22 +400,23 @@ export default function ScoreEntry({
                     </span>
                   )}
                 </p>
-                <p className="tsi-num shrink-0 text-sm font-bold tsi-muted">
+                <p className="tsi-num shrink-0 text-[13px] tsi-muted">
                   {net != null ? `net ${net}` : ""}
                 </p>
               </div>
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <Stepper
-                  label={`${subject.label} score`}
-                  value={value.gross}
-                  min={1}
-                  max={20}
-                  onChange={(next) => setValue(subject.type, subject.id, "gross", next)}
-                />
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-extrabold uppercase tracking-widest tsi-muted">
-                    Putts
-                  </span>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="mb-1 text-[12px] tsi-muted">Score</p>
+                  <Stepper
+                    label={`${subject.label} score`}
+                    value={value.gross}
+                    min={1}
+                    max={20}
+                    onChange={(next) => setValue(subject.type, subject.id, "gross", next)}
+                  />
+                </div>
+                <div>
+                  <p className="mb-1 text-[12px] tsi-muted">Putts</p>
                   <Stepper
                     label={`${subject.label} putts`}
                     value={value.putts}
@@ -428,7 +433,7 @@ export default function ScoreEntry({
 
         <button
           type="button"
-          className="tsi-btn tsi-btn-primary w-full text-lg"
+          className="tsi-btn tsi-btn-primary w-full"
           onClick={saveHole}
           disabled={saving || !canEdit}
           style={{ opacity: saving || !canEdit ? 0.6 : 1 }}
@@ -436,7 +441,7 @@ export default function ScoreEntry({
           {saving ? "Saving…" : `Save hole ${hole}`}
         </button>
 
-        <p className="text-center text-sm font-bold" aria-live="polite">
+        <p className="text-center text-[13px] tsi-muted" aria-live="polite">
           {!online && "○ Offline — scores are kept on this phone"}
           {online && queued.length > 0 && `↻ ${queued.length} hole(s) waiting to sync`}
           {online && queued.length === 0 && status}
@@ -446,7 +451,7 @@ export default function ScoreEntry({
         </p>
 
         {holeResult?.winner && (
-          <p className="text-center text-sm font-black">
+          <p className="text-center text-[13px] font-semibold">
             Hole {hole}:{" "}
             {holeResult.winner === "halved"
               ? "halved"
@@ -477,25 +482,23 @@ function MiniCard({
 
   return (
     <Panel className="!p-0">
-      <h2 className="border-b-2 px-4 py-2 text-sm font-black uppercase tracking-widest" style={{ borderColor: "var(--tsi-line)" }}>
-        Card
-      </h2>
+      <h2 className="tsi-rule-b px-4 py-2.5 text-[15px] font-bold">Card</h2>
       <div className="tsi-scroll">
         <table className="w-full min-w-[640px] border-collapse text-center">
           <thead>
             <tr>
-              <th className="sticky left-0 z-10 px-2 py-1 text-left text-xs font-black uppercase" style={{ background: "var(--tsi-panel)" }}>
+              <th className="sticky left-0 z-10 px-2 py-1 text-left text-xs font-bold uppercase" style={{ background: "var(--tsi-shell)" }}>
                 Hole
               </th>
               {holes.map((h) => (
-                <th key={h.number} className="tsi-num px-1 py-1 text-xs font-black">
+                <th key={h.number} className="tsi-num px-1 py-1 text-xs font-bold">
                   {h.number}
                 </th>
               ))}
-              <th className="tsi-num px-2 py-1 text-xs font-black">Tot</th>
+              <th className="tsi-num px-2 py-1 text-xs font-bold">Tot</th>
             </tr>
             <tr className="tsi-muted">
-              <th className="sticky left-0 z-10 px-2 py-1 text-left text-[11px] font-bold" style={{ background: "var(--tsi-panel)" }}>
+              <th className="sticky left-0 z-10 px-2 py-1 text-left text-[11px] font-bold" style={{ background: "var(--tsi-shell)" }}>
                 Par
               </th>
               {holes.map((h) => (
@@ -512,8 +515,8 @@ function MiniCard({
             {subjects.map((subject) => {
               let total = 0;
               return (
-                <tr key={`${subject.type}:${subject.id}`} className="border-t-2" style={{ borderColor: "var(--tsi-line)" }}>
-                  <th className="sticky left-0 z-10 max-w-[7rem] truncate px-2 py-1 text-left text-xs font-black" style={{ background: "var(--tsi-panel)" }}>
+                <tr key={`${subject.type}:${subject.id}`} className="tsi-rule-t">
+                  <th className="sticky left-0 z-10 max-w-[7rem] truncate px-2 py-1 text-left text-xs font-bold" style={{ background: "var(--tsi-shell)" }}>
                     {subject.label}
                   </th>
                   {holes.map((h) => {
@@ -525,24 +528,24 @@ function MiniCard({
                       </td>
                     );
                   })}
-                  <td className="tsi-num px-2 py-1 text-sm font-black">{total || "·"}</td>
+                  <td className="tsi-num px-2 py-1 text-sm font-bold">{total || "·"}</td>
                 </tr>
               );
             })}
-            <tr className="border-t-2" style={{ borderColor: "var(--tsi-line)" }}>
-              <th className="sticky left-0 z-10 px-2 py-1 text-left text-xs font-black" style={{ background: "var(--tsi-panel)" }}>
+            <tr className="tsi-rule-t">
+              <th className="sticky left-0 z-10 px-2 py-1 text-left text-xs font-bold" style={{ background: "var(--tsi-shell)" }}>
                 Match
               </th>
               {holes.map((h) => {
                 const result = localState.results.find((r) => r.hole === h.number);
                 const running = result?.winner ? result.running : null;
                 return (
-                  <td key={h.number} className="tsi-num px-1 py-1 text-[11px] font-black">
+                  <td key={h.number} className="tsi-num px-1 py-1 text-[11px] font-bold">
                     {running == null ? "·" : running === 0 ? "AS" : running > 0 ? `${running}▲` : `${-running}▼`}
                   </td>
                 );
               })}
-              <td className="px-2 py-1 text-[11px] font-black">
+              <td className="px-2 py-1 text-[11px] font-bold">
                 {localState.differential === 0 ? "AS" : Math.abs(localState.differential)}
               </td>
             </tr>

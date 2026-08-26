@@ -67,21 +67,27 @@ export default async function BetsPage({
     <>
       <PageTitle kicker="Side action" title="Bets & ledger" />
       {rounds.length > 1 && (
-        <div className="mb-4 flex flex-wrap gap-2">
-          {rounds.map((item) => (
-            <Link
-              key={item.id}
-              href={`/bets?r=${item.id}`}
-              className="tsi-tap flex items-center rounded-xl border-2 px-3 text-sm font-black"
-              style={{
-                borderColor: item.id === round.id ? "var(--color-ink)" : "var(--tsi-line)",
-                background: item.id === round.id ? "var(--color-ink)" : "transparent",
-                color: item.id === round.id ? "#fff" : "var(--tsi-text)",
-              }}
-            >
-              {item.name}
-            </Link>
-          ))}
+        <div className="tsi-scroll mb-4 -mx-1 px-1">
+          <div className="flex gap-2 pb-1">
+            {rounds.map((item) => {
+              const on = item.id === round.id;
+              return (
+                <Link
+                  key={item.id}
+                  href={`/bets?r=${item.id}`}
+                  className="shrink-0 rounded-full tsi-rule px-3.5 py-2 text-[14px]"
+                  style={{
+                    borderColor: on ? "var(--tsi-text)" : "var(--tsi-line)",
+                    background: on ? "var(--tsi-text)" : "transparent",
+                    color: on ? "var(--tsi-shell)" : "var(--tsi-text)",
+                    fontWeight: on ? 600 : 500,
+                  }}
+                >
+                  {item.name}
+                </Link>
+              );
+            })}
+          </div>
         </div>
       )}
       <Bets

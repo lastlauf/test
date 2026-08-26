@@ -41,7 +41,7 @@ async function post(url: string, body: unknown, method = "POST") {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <Panel className="space-y-3">
-      <h2 className="text-lg font-black">{title}</h2>
+      <h2 className="text-lg font-bold">{title}</h2>
       {children}
     </Panel>
   );
@@ -132,7 +132,7 @@ export default function Admin(props: Props) {
             <a
               key={t.id}
               href={`/admin?t=${t.id}`}
-              className="tsi-tap flex items-center rounded-xl border-2 px-3 text-sm font-black"
+              className="tsi-tap flex items-center rounded-xl tsi-rule px-3 text-sm font-bold"
               style={{
                 borderColor: t.id === selected?.id ? "var(--color-ink)" : "var(--tsi-line)",
                 background: t.id === selected?.id ? "var(--color-ink)" : "transparent",
@@ -198,20 +198,20 @@ export default function Admin(props: Props) {
           <table className="min-w-[640px] border-collapse text-center">
             <tbody>
               <tr>
-                <th className="px-1 text-left text-xs font-black">Hole</th>
+                <th className="px-1 text-left text-xs font-bold">Hole</th>
                 {holes.map((_, i) => (
-                  <td key={i} className="tsi-num px-1 text-xs font-black">
+                  <td key={i} className="tsi-num px-1 text-xs font-bold">
                     {i + 1}
                   </td>
                 ))}
               </tr>
               <tr>
-                <th className="px-1 text-left text-xs font-black">Par</th>
+                <th className="px-1 text-left text-xs font-bold">Par</th>
                 {holes.map((hole, i) => (
                   <td key={i} className="px-0.5">
                     <input
                       aria-label={`Hole ${i + 1} par`}
-                      className="tsi-num w-9 rounded border-2 py-1 text-center text-sm font-bold"
+                      className="tsi-num w-9 rounded tsi-rule py-1 text-center text-sm font-bold"
                       style={{ borderColor: "var(--tsi-line)", background: "var(--tsi-shell)" }}
                       value={hole.par}
                       onChange={(e) => {
@@ -224,12 +224,12 @@ export default function Admin(props: Props) {
                 ))}
               </tr>
               <tr>
-                <th className="px-1 text-left text-xs font-black">SI</th>
+                <th className="px-1 text-left text-xs font-bold">SI</th>
                 {holes.map((hole, i) => (
                   <td key={i} className="px-0.5">
                     <input
                       aria-label={`Hole ${i + 1} stroke index`}
-                      className="tsi-num w-9 rounded border-2 py-1 text-center text-sm font-bold"
+                      className="tsi-num w-9 rounded tsi-rule py-1 text-center text-sm font-bold"
                       style={{ borderColor: "var(--tsi-line)", background: "var(--tsi-shell)" }}
                       value={hole.strokeIndex}
                       onChange={(e) => {
@@ -339,7 +339,7 @@ export default function Admin(props: Props) {
                   </span>
                   <button
                     type="button"
-                    className="text-xs font-black uppercase"
+                    className="text-xs font-bold uppercase"
                     style={{ color: "var(--color-flag)" }}
                     onClick={() =>
                       run(() =>
@@ -373,7 +373,7 @@ export default function Admin(props: Props) {
                     key={player.id}
                     type="button"
                     onClick={() => toggle(fieldPlayers, setFieldPlayers, player.id)}
-                    className="tsi-tap rounded-xl border-2 px-3 text-sm font-black"
+                    className="tsi-tap rounded-xl tsi-rule px-3 text-sm font-bold"
                     style={{
                       borderColor: on ? "var(--color-ink)" : "var(--tsi-line)",
                       background: on ? "var(--color-ink)" : "transparent",
@@ -499,7 +499,7 @@ export default function Admin(props: Props) {
                       </span>
                       <button
                         type="button"
-                        className="text-xs font-black uppercase"
+                        className="text-xs font-bold uppercase"
                         style={{ color: "var(--color-flag)" }}
                         onClick={() =>
                           run(() =>
@@ -532,7 +532,7 @@ export default function Admin(props: Props) {
                               key={entry.playerId}
                               type="button"
                               onClick={() => toggle(list, setList, entry.playerId)}
-                              className="tsi-tap rounded-xl border-2 px-3 text-sm font-black"
+                              className="tsi-tap rounded-xl tsi-rule px-3 text-sm font-bold"
                               style={{
                                 borderColor: on ? "var(--color-ink)" : "var(--tsi-line)",
                                 background: on ? "var(--color-ink)" : "transparent",

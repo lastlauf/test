@@ -103,7 +103,7 @@ export default function ProfileEditor({ player }: { player: Player }) {
             {photo && (
               <button
                 type="button"
-                className="text-sm font-black uppercase tracking-widest"
+                className="text-sm font-bold uppercase tracking-widest"
                 style={{ color: "var(--color-flag)" }}
                 onClick={() => setPhoto(null)}
               >

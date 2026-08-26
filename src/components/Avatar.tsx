@@ -22,7 +22,7 @@ export function Avatar({
         alt=""
         width={size}
         height={size}
-        className="shrink-0 rounded-full border-2 object-cover"
+        className="shrink-0 rounded-full tsi-rule object-cover"
         style={{ borderColor: "var(--tsi-line)", width: size, height: size }}
       />
     );
@@ -30,7 +30,7 @@ export function Avatar({
   return (
     <span
       aria-hidden
-      className="grid shrink-0 place-items-center rounded-full border-2 font-black"
+      className="grid shrink-0 place-items-center rounded-full tsi-rule font-bold"
       style={{
         width: size,
         height: size,

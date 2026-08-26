@@ -21,7 +21,7 @@ export default async function ArchivePage() {
           <Link key={tournament.id} href={`/archive/${tournament.year}`} className="block">
             <Panel className="flex items-center justify-between gap-3">
               <span className="min-w-0">
-                <span className="block text-xl font-black">{tournament.year}</span>
+                <span className="block text-[19px] font-bold">{tournament.year}</span>
                 <span className="block truncate text-sm font-bold tsi-muted">
                   {tournament.champion
                     ? `Champion: ${tournament.champion}`
@@ -30,7 +30,7 @@ export default async function ArchivePage() {
                       : "Not yet played"}
                 </span>
               </span>
-              <span className="tsi-num shrink-0 text-right font-black">
+              <span className="tsi-num shrink-0 text-right text-[15px] font-bold">
                 {teams.map((t) => t.points).join(" – ")}
               </span>
             </Panel>

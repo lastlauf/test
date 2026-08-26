@@ -16,7 +16,7 @@ export default async function MePage() {
         kicker="Your account"
         title={player.display_name}
         action={
-          <Link href={`/players/${player.username}`} className="text-sm font-bold underline">
+          <Link href={`/players/${player.username}`} className="text-[14px] font-semibold">
             Profile
           </Link>
         }

@@ -11,14 +11,12 @@ export function PageTitle({
   action?: ReactNode;
 }) {
   return (
-    <div className="mb-4 flex items-end justify-between gap-3">
-      <div>
+    <div className="mb-5 flex items-end justify-between gap-3">
+      <div className="min-w-0">
         {kicker && (
-          <p className="text-xs font-extrabold uppercase tracking-[0.18em] tsi-muted">
-            {kicker}
-          </p>
+          <p className="mb-0.5 text-[12px] font-semibold tsi-muted">{kicker}</p>
         )}
-        <h1 className="text-2xl font-black leading-tight tracking-tight">{title}</h1>
+        <h1 className="text-[26px] font-extrabold leading-[1.1]">{title}</h1>
       </div>
       {action}
     </div>
@@ -38,8 +36,20 @@ export function Panel({
 export function Empty({ children }: { children: ReactNode }) {
   return (
     <Panel className="text-center">
-      <p className="tsi-muted font-semibold">{children}</p>
+      <p className="tsi-muted">{children}</p>
     </Panel>
+  );
+}
+
+/** A team's colour as a dot — quieter than a filled pill next to a name. */
+export function TeamDot({ color }: { color?: string | null }) {
+  if (!color) return null;
+  return (
+    <span
+      aria-hidden
+      className="inline-block h-2.5 w-2.5 shrink-0 rounded-full"
+      style={{ background: color }}
+    />
   );
 }
 
@@ -52,16 +62,14 @@ export function TeamPill({
 }) {
   if (!name) return null;
   return (
-    <span
-      className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-wide text-white"
-      style={{ background: color ?? "#334155" }}
-    >
+    <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold tsi-muted">
+      <TeamDot color={color} />
       {name}
     </span>
   );
 }
 
-/** Circle/square treatment golfers expect: birdie ringed, bogey boxed. */
+/** Circle for a birdie, box for a bogey — the marks golfers already read. */
 export function ScoreMark({
   gross,
   par,
@@ -73,12 +81,16 @@ export function ScoreMark({
 }) {
   if (gross == null) return <span className={`tsi-muted ${className}`}>–</span>;
   const diff = gross - par;
-  const base = "inline-grid place-items-center tsi-num font-black h-8 w-8";
+  const base = "inline-grid place-items-center tsi-num font-bold h-8 w-8";
   if (diff <= -2) {
     return (
       <span
         className={`${base} rounded-full ${className}`}
-        style={{ boxShadow: "0 0 0 2px var(--color-birdie), 0 0 0 4px var(--tsi-shell), 0 0 0 6px var(--color-birdie)" }}
+        style={{
+          boxShadow:
+            "0 0 0 1.5px var(--color-flag), 0 0 0 3px var(--tsi-shell), 0 0 0 4.5px var(--color-flag)",
+          color: "var(--color-flag)",
+        }}
       >
         {gross}
       </span>
@@ -87,28 +99,21 @@ export function ScoreMark({
   if (diff === -1) {
     return (
       <span
-        className={`${base} rounded-full border-2 ${className}`}
-        style={{ borderColor: "var(--color-birdie)", color: "var(--color-birdie)" }}
+        className={`${base} rounded-full ${className}`}
+        style={{
+          boxShadow: "0 0 0 1.5px var(--color-flag)",
+          color: "var(--color-flag)",
+        }}
       >
         {gross}
       </span>
     );
   }
-  if (diff === 1) {
+  if (diff >= 1) {
     return (
       <span
-        className={`${base} border-2 ${className}`}
-        style={{ borderColor: "var(--tsi-text)" }}
-      >
-        {gross}
-      </span>
-    );
-  }
-  if (diff >= 2) {
-    return (
-      <span
-        className={`${base} border-4 border-double ${className}`}
-        style={{ borderColor: "var(--tsi-text)" }}
+        className={`${base} ${className}`}
+        style={{ boxShadow: `0 0 0 ${diff >= 2 ? "1.5px" : "1.5px"} var(--tsi-text)` }}
       >
         {gross}
       </span>
@@ -127,12 +132,10 @@ export function Stat({
   sub?: ReactNode;
 }) {
   return (
-    <div className="tsi-panel px-3 py-2">
-      <p className="text-[11px] font-extrabold uppercase tracking-[0.14em] tsi-muted">
-        {label}
-      </p>
-      <p className="tsi-num text-2xl font-black leading-tight">{value}</p>
-      {sub && <p className="text-xs font-semibold tsi-muted">{sub}</p>}
+    <div className="tsi-panel px-3 py-3">
+      <p className="text-[12px] font-semibold tsi-muted">{label}</p>
+      <p className="tsi-num text-[26px] font-extrabold leading-tight">{value}</p>
+      {sub && <p className="text-[12px] tsi-muted">{sub}</p>}
     </div>
   );
 }

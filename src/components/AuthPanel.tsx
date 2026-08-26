@@ -95,66 +95,37 @@ export default function AuthPanel({
   };
 
   return (
-    <div className="mx-auto w-full max-w-md">
+    <div className="mx-auto w-full max-w-sm">
       {/* Hero */}
-      <div className="mb-5 flex items-end gap-3">
-        <div className="tsi-enter-bird shrink-0">
-          <TurkeyMark size={116} />
+      <div className="tsi-enter mb-6 text-center">
+        <div className="mb-1 flex justify-center">
+          <TurkeyMark size={132} />
         </div>
-        <div className="tsi-enter min-w-0 pb-1" style={{ ["--i" as string]: 1 }}>
-          <p className="text-[11px] font-extrabold uppercase tracking-[0.28em] tsi-muted">
-            Annual
-          </p>
-          <h1
-            className="font-black uppercase"
-            style={{
-              fontSize: "clamp(2rem, 11vw, 2.9rem)",
-              lineHeight: 0.84,
-              letterSpacing: "-0.045em",
-            }}
-          >
-            Turkey
-            <br />
-            Slice
-          </h1>
-          <p className="mt-1 text-[13px] font-extrabold uppercase tracking-[0.22em]">
-            Invitational
-          </p>
-        </div>
-      </div>
-
-      {/* The warning every year deserves */}
-      <div
-        className="tsi-enter mb-5 rounded-xl px-4 py-3"
-        style={{ ["--i" as string]: 2, background: "var(--color-turkey)", color: "#fff" }}
-      >
-        <p className="text-base font-black leading-tight">
+        <h1 className="text-[26px] font-extrabold leading-tight">
+          Turkey Slice Invitational
+        </h1>
+        <p
+          className="mx-auto mt-3 max-w-[19rem] text-[15px] font-semibold"
+          style={{ color: "var(--tsi-accent)" }}
+        >
           Lock the clubhouse — John&apos;s about to commit fowl play.
         </p>
-        <p className="mt-1 text-sm font-semibold opacity-90">
+        <p className="mx-auto mt-1 max-w-[19rem] text-[13px] tsi-muted">
           Three birdies in a row is a turkey. Three of your paychecks is just John.
         </p>
       </div>
 
       {/* Card */}
-      <section
-        className="tsi-enter tsi-sticker rounded-2xl border-2 p-4"
-        style={{
-          ["--i" as string]: 3,
-          background: "var(--tsi-shell)",
-          borderColor: "var(--tsi-line)",
-        }}
-      >
+      <section className="tsi-enter tsi-panel p-4" style={{ ["--i" as string]: 1 }}>
         <div
-          className="relative mb-4 grid grid-cols-2 rounded-xl border-2 p-1"
-          style={{ borderColor: "var(--tsi-line)" }}
-        >
+          className="relative mb-4 grid grid-cols-2 rounded-xl tsi-rule p-1"
+                  >
           <span
             aria-hidden
             className="tsi-segment-thumb absolute inset-y-1 left-1 rounded-lg"
             style={{
               width: "calc(50% - 0.25rem)",
-              background: "var(--color-ink)",
+              background: "var(--tsi-text)",
               transform: mode === "create" ? "translateX(100%)" : "translateX(0)",
             }}
           />
@@ -164,8 +135,11 @@ export default function AuthPanel({
               type="button"
               onClick={() => switchTo(option)}
               aria-pressed={mode === option}
-              className="tsi-tap relative z-10 rounded-lg text-[12px] font-black uppercase tracking-[0.04em]"
-              style={{ color: mode === option ? "#fff" : "var(--tsi-text)" }}
+              className="tsi-tap relative z-10 rounded-lg text-[14px] font-semibold"
+              style={{
+              color: mode === option ? "var(--tsi-shell)" : "var(--tsi-text)",
+              fontWeight: mode === option ? 700 : 500,
+            }}
             >
               {option === "signin" ? "Sign in" : "Create account"}
             </button>
@@ -183,16 +157,16 @@ export default function AuthPanel({
               <GoogleGlyph />
               Continue with Google
             </button>
-            <p className="mt-1.5 text-center text-xs font-semibold tsi-muted">
+            <p className="mt-2 text-center text-[13px] tsi-muted">
               Google sign-in isn&apos;t switched on for this deployment yet.
             </p>
           </div>
         )}
 
         <div className="my-4 flex items-center gap-3" aria-hidden>
-          <span className="h-0.5 flex-1" style={{ background: "var(--tsi-line)" }} />
-          <span className="text-xs font-black uppercase tracking-[0.2em] tsi-muted">or</span>
-          <span className="h-0.5 flex-1" style={{ background: "var(--tsi-line)" }} />
+          <span className="tsi-rule-t flex-1" />
+          <span className="text-[12px] font-medium tsi-muted">or</span>
+          <span className="tsi-rule-t flex-1" />
         </div>
 
         <form onSubmit={submit} className="space-y-3">
@@ -264,7 +238,7 @@ export default function AuthPanel({
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
-                className="absolute right-1 top-1/2 -translate-y-1/2 rounded-lg px-3 text-xs font-black uppercase tracking-wide"
+                className="absolute right-1 top-1/2 -translate-y-1/2 rounded-lg px-3 text-[13px] font-semibold"
                 style={{ minHeight: 44, color: "var(--tsi-muted)" }}
                 aria-pressed={showPassword}
               >
@@ -285,7 +259,7 @@ export default function AuthPanel({
                 value={form.handicapIndex}
                 onChange={set("handicapIndex")}
               />
-              <p className="mt-1 text-xs font-semibold tsi-muted">
+              <p className="mt-1.5 text-[13px] tsi-muted">
                 A guess is fine — you can fix it on your profile later.
               </p>
             </div>
@@ -293,7 +267,7 @@ export default function AuthPanel({
 
           {error && (
             <p
-              className="rounded-xl border-2 px-3 py-2 text-sm font-bold"
+              className="rounded-xl tsi-rule px-3 py-2 text-[14px] font-semibold"
               role="alert"
               style={{ borderColor: "var(--color-flag)", color: "var(--color-flag)" }}
             >
@@ -319,8 +293,8 @@ export default function AuthPanel({
       </section>
 
       <p
-        className="tsi-enter mt-4 text-center text-xs font-semibold tsi-muted"
-        style={{ ["--i" as string]: 4 }}
+        className="tsi-enter mt-4 text-center text-[13px] tsi-muted"
+        style={{ ["--i" as string]: 2 }}
       >
         Scores and side bets you post are visible to everyone in the tournament.
       </p>

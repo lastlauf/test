@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import "./globals.css";
 import { SunToggle, TabBar } from "@/components/Chrome";
+import { LogoMark } from "@/components/TurkeyMark";
 import { currentPlayer } from "@/lib/auth";
 
 export const metadata: Metadata = {
@@ -14,7 +15,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#7c2d12",
+  themeColor: "#8a3312",
 };
 
 export default async function RootLayout({
@@ -34,36 +35,25 @@ export default async function RootLayout({
           }}
         />
         <header
-          className="sticky top-0 z-40 flex items-center gap-3 border-b-2 px-4 py-2"
-          style={{ background: "var(--tsi-shell)", borderColor: "var(--tsi-line)" }}
+          className="tsi-rule-b sticky top-0 z-40 flex items-center gap-3 px-4 py-2.5"
+          style={{ background: "var(--tsi-shell)" }}
         >
-          <Link href="/" className="flex items-center gap-2 font-black tracking-tight">
-            <span
-              className="grid h-9 w-9 place-items-center rounded-lg text-base"
-              style={{ background: "var(--color-turkey)", color: "#fff" }}
-              aria-hidden
-            >
-              🦃
-            </span>
-            <span className="text-lg leading-none">
-              TSI
-              <span className="ml-2 hidden text-xs font-bold uppercase tracking-widest tsi-muted sm:inline">
-                Turkey Slice Invitational
-              </span>
-            </span>
+          <Link href="/" className="flex items-center gap-2">
+            <LogoMark size={30} />
+            <span className="text-lg font-extrabold tracking-tight">TSI</span>
           </Link>
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex items-center gap-1">
             <SunToggle />
             <Link
               href={player ? "/me" : "/login"}
-              className="tsi-tap flex items-center rounded-xl border-2 px-3 text-sm font-extrabold"
-              style={{ borderColor: "var(--tsi-line)" }}
+              className="tsi-tap flex items-center px-2 text-[15px] font-semibold"
+              style={{ color: "var(--tsi-muted)" }}
             >
               {player ? player.username : "Sign in"}
             </Link>
           </div>
         </header>
-        <main className="mx-auto w-full max-w-3xl px-4 pb-28 pt-4">{children}</main>
+        <main className="mx-auto w-full max-w-3xl px-4 pb-28 pt-5">{children}</main>
         <TabBar />
       </body>
     </html>

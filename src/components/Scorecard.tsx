@@ -16,29 +16,29 @@ export function Scorecard({ match, holes }: { match: MatchView; holes: Hole[] })
         <thead>
           <tr>
             <th
-              className="sticky left-0 z-10 px-2 py-1 text-left text-xs font-black uppercase"
-              style={{ background: "var(--tsi-panel)" }}
+              className="sticky left-0 z-10 px-2 py-1 text-left text-xs font-bold uppercase"
+              style={{ background: "var(--tsi-shell)" }}
             >
               Hole
             </th>
             {front.map((h) => (
-              <th key={h.number} className="tsi-num px-1 py-1 text-xs font-black">
+              <th key={h.number} className="tsi-num px-1 py-1 text-xs font-bold">
                 {h.number}
               </th>
             ))}
-            <th className="px-1 py-1 text-xs font-black tsi-muted">Out</th>
+            <th className="px-1 py-1 text-xs font-bold tsi-muted">Out</th>
             {back.map((h) => (
-              <th key={h.number} className="tsi-num px-1 py-1 text-xs font-black">
+              <th key={h.number} className="tsi-num px-1 py-1 text-xs font-bold">
                 {h.number}
               </th>
             ))}
-            <th className="px-1 py-1 text-xs font-black tsi-muted">In</th>
-            <th className="px-2 py-1 text-xs font-black">Tot</th>
+            <th className="px-1 py-1 text-xs font-bold tsi-muted">In</th>
+            <th className="px-2 py-1 text-xs font-bold">Tot</th>
           </tr>
           <tr className="tsi-muted">
             <th
               className="sticky left-0 z-10 px-2 py-1 text-left text-[11px] font-bold"
-              style={{ background: "var(--tsi-panel)" }}
+              style={{ background: "var(--tsi-shell)" }}
             >
               Par
             </th>
@@ -72,12 +72,11 @@ export function Scorecard({ match, holes }: { match: MatchView; holes: Hole[] })
             return (
               <tr
                 key={`${subject.type}:${subject.id}`}
-                className="border-t-2"
-                style={{ borderColor: "var(--tsi-line)" }}
-              >
+                className="tsi-rule-t"
+                              >
                 <th
-                  className="sticky left-0 z-10 max-w-[8rem] truncate px-2 py-1 text-left text-xs font-black"
-                  style={{ background: "var(--tsi-panel)" }}
+                  className="sticky left-0 z-10 max-w-[8rem] truncate px-2 py-1 text-left text-xs font-bold"
+                  style={{ background: "var(--tsi-shell)" }}
                 >
                   {subject.label}
                 </th>
@@ -86,14 +85,14 @@ export function Scorecard({ match, holes }: { match: MatchView; holes: Hole[] })
                     {cell(h) ?? "·"}
                   </td>
                 ))}
-                <td className="tsi-num px-1 py-1 text-sm font-black">{sum(front) || "·"}</td>
+                <td className="tsi-num px-1 py-1 text-sm font-bold">{sum(front) || "·"}</td>
                 {back.map((h) => (
                   <td key={h.number} className="tsi-num px-1 py-1 text-sm font-bold">
                     {cell(h) ?? "·"}
                   </td>
                 ))}
-                <td className="tsi-num px-1 py-1 text-sm font-black">{sum(back) || "·"}</td>
-                <td className="tsi-num px-2 py-1 text-sm font-black">{sum(holes) || "·"}</td>
+                <td className="tsi-num px-1 py-1 text-sm font-bold">{sum(back) || "·"}</td>
+                <td className="tsi-num px-2 py-1 text-sm font-bold">{sum(holes) || "·"}</td>
               </tr>
             );
           })}
