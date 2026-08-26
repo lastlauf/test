@@ -37,12 +37,15 @@ export function verifyPassword(password: string, stored: string | null): boolean
   return timingSafeEqual(derived, expected);
 }
 
-export function createSession(playerId: string): { token: string; expires: Date } {
+export async function createSession(
+  playerId: string,
+): Promise<{ token: string; expires: Date }> {
   const token = randomBytes(32).toString("hex");
   const expires = new Date(Date.now() + SESSION_DAYS * 864e5);
-  db()
-    .prepare("INSERT INTO sessions (token, player_id, expires_at) VALUES (?, ?, ?)")
-    .run(token, playerId, expires.toISOString());
+  await db().run(
+    "INSERT INTO sessions (token, player_id, expires_at) VALUES (?, ?, ?)",
+    [token, playerId, expires.toISOString()],
+  );
   return { token, expires };
 }
 
@@ -60,7 +63,7 @@ export async function setSessionCookie(token: string, expires: Date) {
 export async function clearSession() {
   const jar = await cookies();
   const token = jar.get(SESSION_COOKIE)?.value;
-  if (token) db().prepare("DELETE FROM sessions WHERE token = ?").run(token);
+  if (token) await db().run("DELETE FROM sessions WHERE token = ?", [token]);
   jar.delete(SESSION_COOKIE);
 }
 
@@ -68,15 +71,15 @@ export async function currentPlayer(): Promise<Player | null> {
   const jar = await cookies();
   const token = jar.get(SESSION_COOKIE)?.value;
   if (!token) return null;
-  const row = db()
-    .prepare(
-      `SELECT p.${PLAYER_COLUMNS.split(", ").join(", p.")}
-       FROM sessions s JOIN players p ON p.id = s.player_id
-       WHERE s.token = ? AND s.expires_at > datetime('now')`,
-    )
-    .get(token) as Player | undefined;
-  return row ?? null;
+  return db().one<Player>(
+    `SELECT p.${PLAYER_COLUMNS.split(", ").join(", p.")}
+     FROM sessions s JOIN players p ON p.id = s.player_id
+     WHERE s.token = ? AND s.expires_at > now()`,
+    [token],
+  );
 }
+
+export class AuthError extends Error {}
 
 export async function requirePlayer(): Promise<Player> {
   const player = await currentPlayer();
@@ -84,28 +87,23 @@ export async function requirePlayer(): Promise<Player> {
   return player;
 }
 
-export class AuthError extends Error {}
-
-export function findPlayerByUsername(username: string): (Player & { password_hash: string | null }) | null {
-  return (
-    (db()
-      .prepare(`SELECT ${PLAYER_COLUMNS}, password_hash FROM players WHERE username = ?`)
-      .get(username) as (Player & { password_hash: string | null }) | undefined) ?? null
+export async function findPlayerByUsername(
+  username: string,
+): Promise<(Player & { password_hash: string | null }) | null> {
+  return db().one<Player & { password_hash: string | null }>(
+    `SELECT ${PLAYER_COLUMNS}, password_hash FROM players WHERE lower(username) = lower(?)`,
+    [username],
   );
 }
 
-export function getPlayer(id: string): Player | null {
-  return (
-    (db().prepare(`SELECT ${PLAYER_COLUMNS} FROM players WHERE id = ?`).get(id) as
-      | Player
-      | undefined) ?? null
-  );
+export async function getPlayer(id: string): Promise<Player | null> {
+  return db().one<Player>(`SELECT ${PLAYER_COLUMNS} FROM players WHERE id = ?`, [id]);
 }
 
-export function listPlayers(): Player[] {
-  return db()
-    .prepare(`SELECT ${PLAYER_COLUMNS} FROM players ORDER BY display_name COLLATE NOCASE`)
-    .all() as Player[];
+export async function listPlayers(): Promise<Player[]> {
+  return db().all<Player>(
+    `SELECT ${PLAYER_COLUMNS} FROM players ORDER BY lower(display_name)`,
+  );
 }
 
 export interface CreatePlayerInput {
@@ -119,18 +117,18 @@ export interface CreatePlayerInput {
   memberSince?: number | null;
 }
 
-export function createPlayer(input: CreatePlayerInput): Player {
+export async function createPlayer(input: CreatePlayerInput): Promise<Player> {
   const id = uid("plr");
-  const isFirst =
-    (db().prepare("SELECT COUNT(*) AS n FROM players").get() as { n: number }).n === 0;
-  db()
-    .prepare(
-      `INSERT INTO players
-         (id, username, display_name, email, password_hash, google_sub, ghin,
-          handicap_index, member_since, is_admin)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    )
-    .run(
+  const counted = await db().one<{ n: number }>(
+    "SELECT COUNT(*)::int AS n FROM players",
+  );
+  const isFirst = (counted?.n ?? 0) === 0;
+  await db().run(
+    `INSERT INTO players
+       (id, username, display_name, email, password_hash, google_sub, ghin,
+        handicap_index, member_since, is_admin)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
       id,
       input.username,
       input.displayName,
@@ -141,8 +139,9 @@ export function createPlayer(input: CreatePlayerInput): Player {
       input.handicapIndex ?? 18,
       input.memberSince ?? new Date().getFullYear(),
       isFirst ? 1 : 0,
-    );
-  return getPlayer(id)!;
+    ],
+  );
+  return (await getPlayer(id))!;
 }
 
 export function googleEnabled(): boolean {
@@ -150,7 +149,12 @@ export function googleEnabled(): boolean {
 }
 
 export function appOrigin(): string {
-  return process.env.APP_ORIGIN ?? "http://localhost:3000";
+  return (
+    process.env.APP_ORIGIN ??
+    (process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : "http://localhost:3000")
+  );
 }
 
 export function validateUsername(username: string): string | null {

@@ -2,20 +2,12 @@ import Link from "next/link";
 import LiveTournament from "@/components/LiveTournament";
 import { Empty, LinkButton, PageTitle } from "@/components/ui";
 import { currentPlayer } from "@/lib/auth";
-import type { BoardPayload } from "@/lib/payloads";
-import {
-  activeTournament,
-  listMatchViews,
-  listRounds,
-  teamStandings,
-  tournamentLeaderboard,
-} from "@/lib/tsi";
+import { activeTournament, buildBoard } from "@/lib/tsi";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const player = await currentPlayer();
-  const tournament = activeTournament();
+  const [player, tournament] = await Promise.all([currentPlayer(), activeTournament()]);
 
   if (!tournament) {
     return (
@@ -34,24 +26,7 @@ export default async function HomePage() {
     );
   }
 
-  const initial: BoardPayload = {
-    tournament,
-    rounds: listRounds(tournament.id).map((round) => ({
-      round,
-      matches: listMatchViews(round.id).map((m) => ({
-        id: m.id,
-        name: m.name,
-        status: m.state.status,
-        decided: m.state.decided,
-        thru: m.state.thru,
-        sides: m.sides,
-        winner: m.state.winner,
-      })),
-    })),
-    teams: teamStandings(tournament.id),
-    leaderboard: tournamentLeaderboard(tournament.id),
-    fetchedAt: new Date().toISOString(),
-  };
+  const initial = await buildBoard(tournament);
 
   return (
     <>

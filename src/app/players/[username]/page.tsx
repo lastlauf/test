@@ -26,15 +26,14 @@ export default async function PlayerProfilePage({
   params: Promise<{ username: string }>;
 }) {
   const { username } = await params;
-  const player = db()
-    .prepare(
-      "SELECT id, username, display_name, handicap_index, ghin, photo, member_since, bio FROM players WHERE username = ?",
-    )
-    .get(username) as Row | undefined;
+  const player = await db().one<Row>(
+    `SELECT id, username, display_name, handicap_index, ghin, photo, member_since, bio
+     FROM players WHERE lower(username) = lower(?)`,
+    [username],
+  );
   if (!player) notFound();
 
-  const me = await currentPlayer();
-  const record = playerRecord(player.id);
+  const [me, record] = await Promise.all([currentPlayer(), playerRecord(player.id)]);
   const tenure = player.member_since
     ? new Date().getFullYear() - player.member_since + 1
     : null;

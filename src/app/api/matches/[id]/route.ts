@@ -1,18 +1,18 @@
 import { json, fail } from "@/lib/api";
-import { getHoles, getMatchView, getRound } from "@/lib/tsi";
+import { getMatchView, loadRound } from "@/lib/tsi";
 
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  const match = getMatchView(id);
+  const match = await getMatchView(id);
   if (!match) return fail("Match not found.", 404);
-  const round = getRound(match.roundId)!;
+  const bundle = (await loadRound(match.roundId))!;
   return json({
     match,
-    round,
-    holes: getHoles(round.course_id),
+    round: bundle.round,
+    holes: bundle.holes,
     fetchedAt: new Date().toISOString(),
   });
 }

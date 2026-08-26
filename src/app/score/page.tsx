@@ -2,13 +2,12 @@ import Link from "next/link";
 import { Empty, PageTitle, Panel } from "@/components/ui";
 import { currentPlayer } from "@/lib/auth";
 import { FORMAT_LABEL, sideName } from "@/lib/scoring";
-import { activeTournament, listMatchViews, listRounds } from "@/lib/tsi";
+import { activeTournament, listRounds, loadRounds } from "@/lib/tsi";
 
 export const dynamic = "force-dynamic";
 
 export default async function ScoreIndexPage() {
-  const player = await currentPlayer();
-  const tournament = activeTournament();
+  const [player, tournament] = await Promise.all([currentPlayer(), activeTournament()]);
   if (!tournament) {
     return (
       <>
@@ -24,9 +23,11 @@ export default async function ScoreIndexPage() {
     );
   }
 
-  const rounds = listRounds(tournament.id).map((round) => ({
+  const roundRows = await listRounds(tournament.id);
+  const bundles = await loadRounds(roundRows.map((r) => r.id));
+  const rounds = roundRows.map((round) => ({
     round,
-    matches: listMatchViews(round.id),
+    matches: bundles.get(round.id)?.matches ?? [],
   }));
 
   return (

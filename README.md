@@ -10,14 +10,18 @@ that keeps working when the cell signal doesn't.
 
 ## Getting started
 
+You need a Postgres database — a local one is fine.
+
 ```bash
 npm install
-npm run seed        # demo course, 10 players, 3 past years, one live tournament
-npm run dev         # http://localhost:3000
+cp .env.example .env.local     # point DATABASE_URL at your Postgres
+npm run db:setup               # create the tables
+npm run seed                   # demo course, 10 players, 3 past years, one live tournament
+npm run dev                    # http://localhost:3000
 ```
 
-The seed prints the demo password. Every seeded player shares it, and
-`dmarchetti` is the admin. Re-seed from scratch with `npm run seed -- --force`.
+The seed prints the demo password; every seeded player shares it, and
+`dmarchetti` is the admin. Re-running `npm run seed` resets the demo data.
 
 ```bash
 npm test            # engine unit tests (scoring, handicaps, wagers, ledger)
@@ -29,12 +33,23 @@ npm run build && npm start
 
 | Variable | Purpose |
 | --- | --- |
-| `TSI_DB_PATH` | SQLite file (default `./data/tsi.db`) |
+| `DATABASE_URL` | Postgres connection string. Use a **pooled** one on serverless hosts |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Enable "Continue with Google". Unset = username accounts only |
 | `APP_ORIGIN` | Public origin used to build the OAuth redirect URI |
+| `TSI_SEED_TOKEN` | Optional. Enables `POST /api/admin/seed` (send it as `x-seed-token`) to reset a demo deployment |
 
 Copy `.env.example` to `.env.local` to set them. The Google redirect URI is
 `${APP_ORIGIN}/api/auth/google/callback`.
+
+### Deploying
+
+The app is a stock Next.js server plus Postgres, so any Node host works. On a
+serverless platform (Vercel and friends), point `DATABASE_URL` at a **pooled**
+connection — Supabase's transaction pooler on port 6543, Neon's pooled host —
+because each request may land in a different instance. Then run the schema once
+(`npm run db:setup` against the hosted database, or paste `db/schema.sql` into
+its SQL console) and, for a demo, set `TSI_SEED_TOKEN` and call
+`POST /api/admin/seed` with that token to load the sample tournament.
 
 ## What's in it
 
@@ -89,14 +104,20 @@ Copy `.env.example` to `.env.local` to set them. The Google redirect URI is
 ```
 src/lib/scoring.ts   pure scoring engine: handicaps, strokes, match play, totals
 src/lib/wagers.ts    Nassau / Skins / H2H and the who-owes-whom ledger
-src/lib/db.ts        SQLite schema and connection
+src/lib/db.ts        Postgres pool and query helpers
 src/lib/tsi.ts       queries and view models shared by pages and the API
+src/lib/demo-seed.ts deterministic demo tournament, emitted as SQL
 src/app/api/…        JSON API (auth, scores, boards, wagers, admin setup)
 src/app/…            App Router pages
 src/components/…     UI, including the on-course entry screen
-scripts/seed.ts      demo data
+db/schema.sql        the schema, applied by `npm run db:setup`
+scripts/             seed and schema CLIs
 tests/               unit tests for the two engines
 ```
+
+Rounds load in bundles: one fixed set of queries fetches every match, side,
+player and score for any number of rounds, so a leaderboard costs the same
+handful of round trips whether it covers one round or a decade of them.
 
 `scoring.ts` and `wagers.ts` are pure and dependency-free, so the same code
 decides a match on the server and updates the screen optimistically on a phone
@@ -119,3 +140,4 @@ the scores players post.
 - Push notifications, and a service worker for a fully offline first load —
   score entry survives losing signal mid-round, but the app has to be loaded
   once with a connection.
+- Sessions are opaque tokens in Postgres; there is no password reset flow yet.

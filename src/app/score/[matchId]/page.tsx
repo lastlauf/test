@@ -4,7 +4,7 @@ import ScoreEntry from "@/components/ScoreEntry";
 import { PageTitle } from "@/components/ui";
 import { currentPlayer } from "@/lib/auth";
 import type { MatchPayload } from "@/lib/payloads";
-import { getHoles, getMatchView, getRound } from "@/lib/tsi";
+import { getMatchView, loadRound } from "@/lib/tsi";
 
 export const dynamic = "force-dynamic";
 
@@ -14,22 +14,22 @@ export default async function ScoreMatchPage({
   params: Promise<{ matchId: string }>;
 }) {
   const { matchId } = await params;
-  const match = getMatchView(matchId);
+  const match = await getMatchView(matchId);
   if (!match) notFound();
-  const round = getRound(match.roundId)!;
+  const bundle = (await loadRound(match.roundId))!;
   const player = await currentPlayer();
 
   const payload: MatchPayload = {
     match,
-    round,
-    holes: getHoles(round.course_id),
+    round: bundle.round,
+    holes: bundle.holes,
     fetchedAt: new Date().toISOString(),
   };
 
   return (
     <>
       <PageTitle
-        kicker={round.name}
+        kicker={bundle.round.name}
         title={match.name}
         action={
           <Link href="/score" className="text-sm font-bold underline">

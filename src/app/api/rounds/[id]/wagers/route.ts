@@ -1,5 +1,5 @@
 import { currentPlayer } from "@/lib/auth";
-import { db, uid } from "@/lib/db";
+import { tx, uid } from "@/lib/db";
 import { fail, json, readJson } from "@/lib/api";
 import { getRound, listMatchViews, listWagers } from "@/lib/tsi";
 import type { WagerType } from "@/lib/wagers";
@@ -9,8 +9,8 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  if (!getRound(id)) return fail("Round not found.", 404);
-  return json({ wagers: listWagers(id) });
+  if (!(await getRound(id))) return fail("Round not found.", 404);
+  return json({ wagers: await listWagers(id) });
 }
 
 interface Body {
@@ -28,7 +28,7 @@ export async function POST(
   const player = await currentPlayer();
   if (!player) return fail("Sign in to add a wager.", 401);
   const { id } = await params;
-  const round = getRound(id);
+  const round = await getRound(id);
   if (!round) return fail("Round not found.", 404);
 
   const body = await readJson<Body>(request);
@@ -36,7 +36,7 @@ export async function POST(
   if (!Number.isFinite(amount) || amount <= 0) return fail("Enter a stake above zero.");
   if (!["nassau", "skins", "h2h"].includes(body.type)) return fail("Unknown wager type.");
 
-  const matches = listMatchViews(round.id);
+  const matches = await listMatchViews(round.id);
   const playerIds = [...new Set(body.playerIds ?? [])];
 
   if (body.type === "nassau") {
@@ -52,25 +52,25 @@ export async function POST(
   }
 
   const wagerId = uid("wgr");
-  const insert = db().transaction(() => {
-    db()
-      .prepare(
-        "INSERT INTO wagers (id, round_id, match_id, type, amount, settings) VALUES (?, ?, ?, ?, ?, ?)",
-      )
-      .run(
+  await tx(async (q) => {
+    await q.run(
+      "INSERT INTO wagers (id, round_id, match_id, type, amount, settings) VALUES (?, ?, ?, ?, ?, ?)",
+      [
         wagerId,
         round.id,
         body.type === "nassau" ? body.matchId : null,
         body.type,
         amount,
         JSON.stringify(body.settings ?? {}),
-      );
-    const link = db().prepare(
-      "INSERT OR IGNORE INTO wager_players (wager_id, player_id) VALUES (?, ?)",
+      ],
     );
-    for (const pid of playerIds) link.run(wagerId, pid);
+    for (const pid of playerIds) {
+      await q.run(
+        "INSERT INTO wager_players (wager_id, player_id) VALUES (?, ?) ON CONFLICT DO NOTHING",
+        [wagerId, pid],
+      );
+    }
   });
-  insert();
 
-  return json({ wagers: listWagers(round.id) }, 201);
+  return json({ wagers: await listWagers(round.id) }, 201);
 }

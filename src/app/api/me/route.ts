@@ -49,6 +49,6 @@ export async function PATCH(request: Request) {
   if (!fields.length) return json({ player });
 
   values.push(player.id);
-  db().prepare(`UPDATE players SET ${fields.join(", ")} WHERE id = ?`).run(...values);
-  return json({ player: getPlayer(player.id) });
+  await db().run(`UPDATE players SET ${fields.join(", ")} WHERE id = ?`, values);
+  return json({ player: await getPlayer(player.id) });
 }

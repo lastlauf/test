@@ -6,7 +6,8 @@ data/*.db-journal
 data/*.db-wal
 data/*.db-shm
 .env
-.env.local
+.env*.local
+.env.production
 *.tsbuildinfo
 next-env.d.ts
 .DS_Store

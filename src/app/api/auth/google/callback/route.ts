@@ -30,11 +30,13 @@ function decodeIdToken(idToken: string): GoogleClaims | null {
 }
 
 /** Turn an email or display name into a free TSI username. */
-function pickUsername(seed: string): string {
+async function pickUsername(seed: string): Promise<string> {
   const base = seed.split("@")[0].replace(/[^a-zA-Z0-9_.-]/g, "").slice(0, 20) || "golfer";
   let candidate = base.length >= 3 ? base : `${base}tsi`;
   let n = 1;
-  while (db().prepare("SELECT 1 FROM players WHERE username = ?").get(candidate)) {
+  while (
+    await db().one("SELECT 1 FROM players WHERE lower(username) = lower(?)", [candidate])
+  ) {
     candidate = `${base}${n++}`;
   }
   return candidate;
@@ -66,37 +68,43 @@ export async function GET(request: Request) {
   const claims = tokens.id_token ? decodeIdToken(tokens.id_token) : null;
   if (!claims?.sub) return fail("Google did not return an account.", 401);
 
-  const existing = db()
-    .prepare("SELECT id FROM players WHERE google_sub = ?")
-    .get(claims.sub) as { id: string } | undefined;
+  const existing = await db().one<{ id: string }>(
+    "SELECT id FROM players WHERE google_sub = ?",
+    [claims.sub],
+  );
   let playerId = existing?.id;
   if (!playerId && claims.email) {
-    const byEmail = db()
-      .prepare("SELECT id FROM players WHERE email = ?")
-      .get(claims.email) as { id: string } | undefined;
+    const byEmail = await db().one<{ id: string }>(
+      "SELECT id FROM players WHERE email = ?",
+      [claims.email],
+    );
     if (byEmail) {
-      db()
-        .prepare("UPDATE players SET google_sub = ? WHERE id = ?")
-        .run(claims.sub, byEmail.id);
+      await db().run("UPDATE players SET google_sub = ? WHERE id = ?", [
+        claims.sub,
+        byEmail.id,
+      ]);
       playerId = byEmail.id;
     }
   }
   if (!playerId) {
-    const player = createPlayer({
-      username: pickUsername(claims.email ?? claims.name ?? "golfer"),
+    const player = await createPlayer({
+      username: await pickUsername(claims.email ?? claims.name ?? "golfer"),
       displayName: claims.name ?? claims.email ?? "New Player",
       email: claims.email ?? null,
       googleSub: claims.sub,
     });
     if (claims.picture) {
-      db().prepare("UPDATE players SET photo = ? WHERE id = ?").run(claims.picture, player.id);
+      await db().run("UPDATE players SET photo = ? WHERE id = ?", [
+        claims.picture,
+        player.id,
+      ]);
     }
     playerId = player.id;
   }
 
-  const player = getPlayer(playerId);
+  const player = await getPlayer(playerId);
   if (!player) return fail("Could not open that account.", 500);
-  const { token, expires } = createSession(player.id);
+  const { token, expires } = await createSession(player.id);
   await setSessionCookie(token, expires);
   return NextResponse.redirect(`${appOrigin()}/`);
 }

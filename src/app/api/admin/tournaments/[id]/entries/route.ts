@@ -1,5 +1,5 @@
 import { currentPlayer } from "@/lib/auth";
-import { db } from "@/lib/db";
+import { db, tx } from "@/lib/db";
 import { fail, json, readJson } from "@/lib/api";
 import { getTournament, listEntries } from "@/lib/tsi";
 
@@ -16,24 +16,24 @@ export async function POST(
   const player = await currentPlayer();
   if (!player?.is_admin) return fail("Only a TSI admin can manage the field.", 403);
   const { id } = await params;
-  if (!getTournament(id)) return fail("Tournament not found.", 404);
+  if (!(await getTournament(id))) return fail("Tournament not found.", 404);
   const body = await readJson<Body>(request);
   const ids = body.playerIds ?? [];
   if (!ids.length) return fail("Pick at least one player.");
 
-  const upsert = db().prepare(
-    `INSERT INTO entries (tournament_id, player_id, team_id, course_handicap)
-     VALUES (?, ?, ?, ?)
-     ON CONFLICT (tournament_id, player_id)
-     DO UPDATE SET team_id = excluded.team_id, course_handicap = excluded.course_handicap`,
-  );
-  db().transaction(() => {
+  await tx(async (q) => {
     for (const pid of ids) {
-      upsert.run(id, pid, body.teamId ?? null, body.courseHandicap ?? null);
+      await q.run(
+        `INSERT INTO entries (tournament_id, player_id, team_id, course_handicap)
+         VALUES (?, ?, ?, ?)
+         ON CONFLICT (tournament_id, player_id)
+         DO UPDATE SET team_id = excluded.team_id, course_handicap = excluded.course_handicap`,
+        [id, pid, body.teamId ?? null, body.courseHandicap ?? null],
+      );
     }
-  })();
+  });
 
-  return json({ entries: listEntries(id) }, 201);
+  return json({ entries: await listEntries(id) }, 201);
 }
 
 export async function DELETE(
@@ -45,8 +45,9 @@ export async function DELETE(
   const { id } = await params;
   const playerId = new URL(request.url).searchParams.get("playerId");
   if (!playerId) return fail("Which player?");
-  db()
-    .prepare("DELETE FROM entries WHERE tournament_id = ? AND player_id = ?")
-    .run(id, playerId);
-  return json({ entries: listEntries(id) });
+  await db().run("DELETE FROM entries WHERE tournament_id = ? AND player_id = ?", [
+    id,
+    playerId,
+  ]);
+  return json({ entries: await listEntries(id) });
 }

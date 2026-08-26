@@ -2,15 +2,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Scorecard } from "@/components/Scorecard";
 import { PageTitle, Panel, Stat, TeamPill } from "@/components/ui";
-import { db } from "@/lib/db";
 import { FORMAT_LABEL, sideName } from "@/lib/scoring";
 import {
-  getHoles,
-  listMatchViews,
+  getTournamentByYear,
   listRounds,
+  loadRounds,
   teamStandings,
   tournamentLeaderboard,
-  type TournamentRow,
 } from "@/lib/tsi";
 
 export const dynamic = "force-dynamic";
@@ -21,14 +19,15 @@ export default async function ArchiveYearPage({
   params: Promise<{ year: string }>;
 }) {
   const { year } = await params;
-  const tournament = db()
-    .prepare("SELECT * FROM tournaments WHERE year = ?")
-    .get(Number(year)) as TournamentRow | undefined;
+  const tournament = await getTournamentByYear(Number(year));
   if (!tournament) notFound();
 
-  const rounds = listRounds(tournament.id);
-  const teams = teamStandings(tournament.id);
-  const board = tournamentLeaderboard(tournament.id);
+  const roundRows = await listRounds(tournament.id);
+  const [bundles, teams, board] = await Promise.all([
+    loadRounds(roundRows.map((r) => r.id)),
+    teamStandings(tournament.id),
+    tournamentLeaderboard(tournament.id),
+  ]);
   const lowNet = [...board].sort((a, b) => a.netToPar - b.netToPar)[0];
   const lowGross = [...board].sort((a, b) => a.toPar - b.toPar)[0];
 
@@ -61,18 +60,24 @@ export default async function ArchiveYearPage({
           <Stat
             label="Low net"
             value={lowNet ? lowNet.displayName.split(" ")[0] : "—"}
-            sub={lowNet ? `${lowNet.net} (${lowNet.netToPar >= 0 ? "+" : ""}${lowNet.netToPar})` : ""}
+            sub={
+              lowNet ? `${lowNet.net} (${lowNet.netToPar >= 0 ? "+" : ""}${lowNet.netToPar})` : ""
+            }
           />
           <Stat
             label="Low gross"
             value={lowGross ? lowGross.displayName.split(" ")[0] : "—"}
-            sub={lowGross ? `${lowGross.gross} (${lowGross.toPar >= 0 ? "+" : ""}${lowGross.toPar})` : ""}
+            sub={
+              lowGross
+                ? `${lowGross.gross} (${lowGross.toPar >= 0 ? "+" : ""}${lowGross.toPar})`
+                : ""
+            }
           />
         </div>
 
-        {rounds.map((round) => {
-          const matches = listMatchViews(round.id);
-          const holes = getHoles(round.course_id);
+        {roundRows.map((round) => {
+          const bundle = bundles.get(round.id);
+          const matches = bundle?.matches ?? [];
           return (
             <Panel key={round.id} className="space-y-4">
               <div className="flex items-baseline justify-between gap-2">
@@ -90,7 +95,7 @@ export default async function ArchiveYearPage({
                     </span>
                     <span className="shrink-0 font-black">{match.state.status}</span>
                   </p>
-                  <Scorecard match={match} holes={holes} />
+                  <Scorecard match={match} holes={bundle?.holes ?? []} />
                 </div>
               ))}
               {matches.length === 0 && (

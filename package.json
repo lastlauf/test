@@ -8,19 +8,20 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "seed": "node --experimental-strip-types scripts/seed.ts",
-    "test": "tsc -p tsconfig.test.json && node --test dist-test/tests/*.test.js"
+    "seed": "node --experimental-strip-types --env-file-if-exists=.env.local scripts/seed.ts",
+    "test": "tsc -p tsconfig.test.json && node --test dist-test/tests/*.test.js",
+    "db:setup": "node --experimental-strip-types --env-file-if-exists=.env.local scripts/db-setup.ts"
   },
   "dependencies": {
-    "better-sqlite3": "^12.4.1",
     "next": "^16.3.3",
+    "pg": "^8.23.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.14",
-    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^22.15.3",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "tailwindcss": "^4.1.14",

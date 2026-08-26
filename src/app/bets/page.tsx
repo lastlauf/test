@@ -7,9 +7,9 @@ import { sideName } from "@/lib/scoring";
 import {
   activeTournament,
   getRound,
-  listMatchViews,
   listRounds,
   listWagers,
+  loadRound,
   roundLedger,
 } from "@/lib/tsi";
 
@@ -21,8 +21,7 @@ export default async function BetsPage({
   searchParams: Promise<{ r?: string }>;
 }) {
   const { r } = await searchParams;
-  const player = await currentPlayer();
-  const tournament = activeTournament();
+  const [player, tournament] = await Promise.all([currentPlayer(), activeTournament()]);
   if (!tournament) {
     return (
       <>
@@ -32,9 +31,9 @@ export default async function BetsPage({
     );
   }
 
-  const rounds = listRounds(tournament.id);
+  const rounds = await listRounds(tournament.id);
   const round =
-    (r ? getRound(r) : null) ??
+    (r ? await getRound(r) : null) ??
     rounds.find((item) => item.status === "live") ??
     rounds[0];
   if (!round) {
@@ -46,7 +45,8 @@ export default async function BetsPage({
     );
   }
 
-  const matches = listMatchViews(round.id);
+  const bundle = await loadRound(round.id);
+  const matches = bundle?.matches ?? [];
   const playerMap = new Map<string, string>();
   for (const match of matches) {
     for (const side of match.sides) {
@@ -54,8 +54,12 @@ export default async function BetsPage({
     }
   }
 
+  const [ledger, wagers] = await Promise.all([
+    roundLedger(round.id),
+    listWagers(round.id),
+  ]);
   const initialLedger: LedgerPayload = {
-    ledger: roundLedger(round.id),
+    ledger,
     fetchedAt: new Date().toISOString(),
   };
 
@@ -90,7 +94,7 @@ export default async function BetsPage({
           label: `${match.name}: ${sideName(match.sides[0])} v ${sideName(match.sides[1])}`,
         }))}
         players={[...playerMap.entries()].map(([id, name]) => ({ id, name }))}
-        wagers={listWagers(round.id)}
+        wagers={wagers}
         initialLedger={initialLedger}
       />
     </>

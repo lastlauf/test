@@ -1,5 +1,5 @@
 import { currentPlayer } from "@/lib/auth";
-import { db, uid } from "@/lib/db";
+import { db, tx, uid } from "@/lib/db";
 import { fail, json, readJson } from "@/lib/api";
 import { getRound, listMatchViews } from "@/lib/tsi";
 
@@ -15,7 +15,7 @@ export async function POST(
   const player = await currentPlayer();
   if (!player?.is_admin) return fail("Only a TSI admin can set pairings.", 403);
   const { id } = await params;
-  const round = getRound(id);
+  const round = await getRound(id);
   if (!round) return fail("Round not found.", 404);
   const body = await readJson<Body>(request);
   const sides = body.sides ?? [];
@@ -30,30 +30,35 @@ export async function POST(
   }
 
   const matchId = uid("mch");
-  const sequence = (
-    db()
-      .prepare("SELECT COALESCE(MAX(sequence), 0) + 1 AS n FROM matches WHERE round_id = ?")
-      .get(round.id) as { n: number }
-  ).n;
+  const next = await db().one<{ n: number }>(
+    "SELECT COALESCE(MAX(sequence), 0) + 1 AS n FROM matches WHERE round_id = ?",
+    [round.id],
+  );
+  const sequence = next?.n ?? 1;
 
-  db().transaction(() => {
-    db()
-      .prepare("INSERT INTO matches (id, round_id, name, sequence) VALUES (?, ?, ?, ?)")
-      .run(matchId, round.id, body.name?.trim() || `Match ${sequence}`, sequence);
-    const side = db().prepare(
-      "INSERT INTO match_sides (id, match_id, label, team_id) VALUES (?, ?, ?, ?)",
-    );
-    const link = db().prepare(
-      "INSERT INTO side_players (side_id, player_id) VALUES (?, ?)",
-    );
-    sides.forEach((s, i) => {
+  await tx(async (q) => {
+    await q.run("INSERT INTO matches (id, round_id, name, sequence) VALUES (?, ?, ?, ?)", [
+      matchId,
+      round.id,
+      body.name?.trim() || `Match ${sequence}`,
+      sequence,
+    ]);
+    for (const [i, side] of sides.entries()) {
       const sideId = uid("sd");
-      side.run(sideId, matchId, s.label || (i === 0 ? "A" : "B"), s.teamId ?? null);
-      for (const pid of s.playerIds) link.run(sideId, pid);
-    });
-  })();
+      await q.run(
+        "INSERT INTO match_sides (id, match_id, label, team_id) VALUES (?, ?, ?, ?)",
+        [sideId, matchId, side.label || (i === 0 ? "A" : "B"), side.teamId ?? null],
+      );
+      for (const pid of side.playerIds) {
+        await q.run("INSERT INTO side_players (side_id, player_id) VALUES (?, ?)", [
+          sideId,
+          pid,
+        ]);
+      }
+    }
+  });
 
-  return json({ matches: listMatchViews(round.id) }, 201);
+  return json({ matches: await listMatchViews(round.id) }, 201);
 }
 
 export async function DELETE(
@@ -65,6 +70,6 @@ export async function DELETE(
   const { id } = await params;
   const matchId = new URL(request.url).searchParams.get("matchId");
   if (!matchId) return fail("Which match?");
-  db().prepare("DELETE FROM matches WHERE id = ? AND round_id = ?").run(matchId, id);
-  return json({ matches: listMatchViews(id) });
+  await db().run("DELETE FROM matches WHERE id = ? AND round_id = ?", [matchId, id]);
+  return json({ matches: await listMatchViews(id) });
 }

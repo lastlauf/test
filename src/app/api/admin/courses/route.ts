@@ -1,5 +1,5 @@
 import { currentPlayer } from "@/lib/auth";
-import { db, uid } from "@/lib/db";
+import { tx, uid } from "@/lib/db";
 import { fail, json, readJson } from "@/lib/api";
 import { listCourses } from "@/lib/tsi";
 
@@ -12,7 +12,7 @@ interface Body {
 }
 
 export async function GET() {
-  return json({ courses: listCourses() });
+  return json({ courses: await listCourses() });
 }
 
 export async function POST(request: Request) {
@@ -26,23 +26,26 @@ export async function POST(request: Request) {
   if (indexes.size !== 18) return fail("Stroke indexes must be 1-18 with no repeats.");
 
   const courseId = uid("crs");
-  db().transaction(() => {
-    db()
-      .prepare("INSERT INTO courses (id, name, city, state) VALUES (?, ?, ?, ?)")
-      .run(courseId, body.name.trim(), body.city ?? null, body.state ?? null);
-    const hole = db().prepare(
-      "INSERT INTO holes (id, course_id, number, par, stroke_index, yardage) VALUES (?, ?, ?, ?, ?, ?)",
-    );
+  await tx(async (q) => {
+    await q.run("INSERT INTO courses (id, name, city, state) VALUES (?, ?, ?, ?)", [
+      courseId,
+      body.name.trim(),
+      body.city ?? null,
+      body.state ?? null,
+    ]);
     for (const h of holes) {
-      hole.run(uid("hol"), courseId, h.number, h.par, h.strokeIndex, h.yardage ?? null);
+      await q.run(
+        "INSERT INTO holes (id, course_id, number, par, stroke_index, yardage) VALUES (?, ?, ?, ?, ?, ?)",
+        [uid("hol"), courseId, h.number, h.par, h.strokeIndex, h.yardage ?? null],
+      );
     }
-    const tee = db().prepare(
-      "INSERT INTO tees (id, course_id, name, rating, slope, yardage) VALUES (?, ?, ?, ?, ?, ?)",
-    );
     for (const t of body.tees ?? []) {
-      tee.run(uid("tee"), courseId, t.name, t.rating, t.slope, t.yardage ?? null);
+      await q.run(
+        "INSERT INTO tees (id, course_id, name, rating, slope, yardage) VALUES (?, ?, ?, ?, ?, ?)",
+        [uid("tee"), courseId, t.name, t.rating, t.slope, t.yardage ?? null],
+      );
     }
-  })();
+  });
 
-  return json({ courses: listCourses() }, 201);
+  return json({ courses: await listCourses() }, 201);
 }

@@ -19,25 +19,22 @@ export async function POST(request: Request) {
   const player = await currentPlayer();
   if (!player?.is_admin) return fail("Only a TSI admin can add rounds.", 403);
   const body = await readJson<Body>(request);
-  if (!getTournament(body.tournamentId)) return fail("Tournament not found.", 404);
+  if (!(await getTournament(body.tournamentId))) return fail("Tournament not found.", 404);
   if (!["fourball", "foursome", "singles"].includes(body.format)) {
     return fail("Format must be fourball, foursome or singles.");
   }
   if (!body.courseId) return fail("Pick a course.");
 
   const id = uid("rnd");
-  const nextSequence =
-    body.sequence ??
-    (db()
-      .prepare("SELECT COALESCE(MAX(sequence), 0) + 1 AS n FROM rounds WHERE tournament_id = ?")
-      .get(body.tournamentId) as { n: number }).n;
+  const next = await db().one<{ n: number }>(
+    "SELECT COALESCE(MAX(sequence), 0) + 1 AS n FROM rounds WHERE tournament_id = ?",
+    [body.tournamentId],
+  );
 
-  db()
-    .prepare(
-      `INSERT INTO rounds (id, tournament_id, name, format, course_id, tee_id, played_on, sequence, allowance)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    )
-    .run(
+  await db().run(
+    `INSERT INTO rounds (id, tournament_id, name, format, course_id, tee_id, played_on, sequence, allowance)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [
       id,
       body.tournamentId,
       body.name?.trim() || "Round",
@@ -45,9 +42,10 @@ export async function POST(request: Request) {
       body.courseId,
       body.teeId ?? null,
       body.playedOn ?? null,
-      nextSequence,
+      body.sequence ?? next?.n ?? 1,
       body.allowance ?? DEFAULT_ALLOWANCE[body.format],
-    );
+    ],
+  );
 
-  return json({ id, rounds: listRounds(body.tournamentId) }, 201);
+  return json({ id, rounds: await listRounds(body.tournamentId) }, 201);
 }

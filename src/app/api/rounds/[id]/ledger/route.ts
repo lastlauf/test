@@ -6,6 +6,6 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  if (!getRound(id)) return fail("Round not found.", 404);
-  return json({ ledger: roundLedger(id), fetchedAt: new Date().toISOString() });
+  if (!(await getRound(id))) return fail("Round not found.", 404);
+  return json({ ledger: await roundLedger(id), fetchedAt: new Date().toISOString() });
 }

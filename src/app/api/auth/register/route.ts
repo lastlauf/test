@@ -24,16 +24,16 @@ export async function POST(request: Request) {
   if (!body.password || body.password.length < 8) {
     return fail("Password must be at least 8 characters.");
   }
-  if (findPlayerByUsername(username)) return fail("That username is taken.", 409);
+  if (await findPlayerByUsername(username)) return fail("That username is taken.", 409);
 
-  const player = createPlayer({
+  const player = await createPlayer({
     username,
     displayName,
     password: body.password,
     handicapIndex: Number.isFinite(body.handicapIndex) ? Number(body.handicapIndex) : 18,
     ghin: body.ghin?.trim() || null,
   });
-  const { token, expires } = createSession(player.id);
+  const { token, expires } = await createSession(player.id);
   await setSessionCookie(token, expires);
   return json({ player });
 }

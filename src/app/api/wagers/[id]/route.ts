@@ -9,7 +9,7 @@ export async function DELETE(
   const player = await currentPlayer();
   if (!player) return fail("Sign in first.", 401);
   const { id } = await params;
-  const result = db().prepare("DELETE FROM wagers WHERE id = ?").run(id);
-  if (result.changes === 0) return fail("Wager not found.", 404);
+  const changes = await db().run("DELETE FROM wagers WHERE id = ?", [id]);
+  if (changes === 0) return fail("Wager not found.", 404);
   return json({ ok: true });
 }
