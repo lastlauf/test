@@ -38,8 +38,24 @@ npm run build && npm start
 | `APP_ORIGIN` | Public origin used to build the OAuth redirect URI |
 | `TSI_SEED_TOKEN` | Optional. Enables `POST /api/admin/seed` (send it as `x-seed-token`) to reset a demo deployment |
 
-Copy `.env.example` to `.env.local` to set them. The Google redirect URI is
-`${APP_ORIGIN}/api/auth/google/callback`.
+Copy `.env.example` to `.env.local` to set them.
+
+### Turning on "Continue with Google"
+
+The button is built and wired; it stays disabled until the deployment has
+Google credentials, because only the tournament's own Google account can issue
+them:
+
+1. In the [Google Cloud console](https://console.cloud.google.com/apis/credentials),
+   create an **OAuth client ID** of type *Web application*.
+2. Add an authorised redirect URI of `${APP_ORIGIN}/api/auth/google/callback` —
+   for example `https://tsi.example.com/api/auth/google/callback`. Add the
+   `http://localhost:3000` version too if you want it in development.
+3. Put the client ID and secret in `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`,
+   and set `APP_ORIGIN` to the deployment's public origin.
+
+Signing in with Google matches an existing account by email, so a player who
+signed up with an email and later uses Google lands on the same profile.
 
 ### Deploying
 
@@ -66,6 +82,10 @@ its SQL console) and, for a demo, set `TSI_SEED_TOKEN` and call
   is offline) and show gross, net and match play side by side.
 - Formats: **fourball** (best ball, 90% allowance), **foursome** (alternate
   shot, one ball per side, 50% of combined), **singles** (100%).
+
+Accounts are created with a name, an email and a password; the public handle
+on `/players/<handle>` is derived from the email. Signing in accepts either the
+handle or the email.
 
 **Priority 2 — profiles and history**
 

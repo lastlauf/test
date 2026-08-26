@@ -25,8 +25,10 @@ export async function PATCH(request: Request) {
   if (body.photo && body.photo.length > MAX_PHOTO_BYTES) {
     return fail("That photo is too large — please pick one under about 500 KB.", 413);
   }
-  if (body.photo && !/^(data:image\/|https?:\/\/)/.test(body.photo)) {
-    return fail("Photo must be an uploaded image.", 400);
+  // SVG is excluded deliberately: it can carry markup, and every photo the app
+  // produces is a canvas-encoded JPEG anyway.
+  if (body.photo && !/^(data:image\/(png|jpeg|webp);|https?:\/\/)/.test(body.photo)) {
+    return fail("Photo must be a PNG, JPEG or WebP image.", 400);
   }
   if (body.handicapIndex != null && !Number.isFinite(body.handicapIndex)) {
     return fail("Handicap index must be a number.");
