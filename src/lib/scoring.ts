@@ -129,6 +129,30 @@ export function subjectsForSide(
   }));
 }
 
+/**
+ * The one subject a player is allowed to post a score for: themselves, or —
+ * in foursomes, where the pair shares a single ball — the side they play on.
+ * Returns null for a spectator, or for a player who is not in this match.
+ */
+export function writableSubject(
+  sides: Side[],
+  format: Format,
+  playerId: string | null | undefined,
+): { type: "player" | "side"; id: string; label: string } | null {
+  if (!playerId) return null;
+  const side = sides.find((s) => s.players.some((p) => p.id === playerId));
+  if (!side) return null;
+  if (format === "foursome") {
+    return {
+      type: "side",
+      id: side.id,
+      label: side.players.map((p) => p.displayName).join(" / ") || side.label,
+    };
+  }
+  const player = side.players.find((p) => p.id === playerId)!;
+  return { type: "player", id: player.id, label: player.displayName };
+}
+
 export interface HoleResult {
   hole: number;
   par: number;

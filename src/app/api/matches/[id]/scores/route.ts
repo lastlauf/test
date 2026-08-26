@@ -1,6 +1,7 @@
 import { currentPlayer } from "@/lib/auth";
 import { db, tx, uid } from "@/lib/db";
 import { fail, json, readJson } from "@/lib/api";
+import { writableSubject } from "@/lib/scoring";
 import { getMatchView, loadRound } from "@/lib/tsi";
 
 interface ScoreInput {
@@ -31,11 +32,13 @@ export async function POST(
   const scores = Array.isArray(body.scores) ? body.scores : [];
   if (!scores.length) return fail("No scores supplied.");
 
-  const validSubjects = new Set<string>();
-  for (const side of match.sides) {
-    validSubjects.add(`side:${side.id}`);
-    for (const p of side.players) validSubjects.add(`player:${p.id}`);
+  // A player posts their own score and nobody else's. In foursomes the pair
+  // shares one ball, so either partner may post the side's score.
+  const mine = writableSubject(match.sides, match.format, player.id);
+  if (!mine) {
+    return fail("You can only post scores for a match you are playing in.", 403);
   }
+  const validSubjects = new Set<string>([`${mine.type}:${mine.id}`]);
 
   const rejected: string[] = [];
   await tx(async (q) => {
@@ -45,7 +48,7 @@ export async function POST(
         continue;
       }
       if (!validSubjects.has(`${row.subjectType}:${row.subjectId}`)) {
-        rejected.push(`${row.subjectType} ${row.subjectId}`);
+        rejected.push(`${row.subjectType} ${row.subjectId} — not your score`);
         continue;
       }
       const gross = row.gross == null || row.gross === 0 ? null : Number(row.gross);

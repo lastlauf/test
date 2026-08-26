@@ -37,7 +37,11 @@ export default async function ScoreMatchPage({
           </Link>
         }
       />
-      <ScoreEntry initial={payload} canEdit={Boolean(player)} />
+      <ScoreEntry
+        initial={payload}
+        myPlayerId={player?.id ?? null}
+        signedIn={Boolean(player)}
+      />
     </>
   );
 }
