@@ -106,37 +106,29 @@ function isActive(pathname: string, href: string) {
 export function TabBar() {
   const pathname = usePathname();
   return (
-    <nav
-      className="tsi-rule-t fixed bottom-0 left-0 right-0 z-40 grid grid-cols-5"
-      style={{
-        background: "var(--tsi-shell)",
-        paddingBottom: "env(safe-area-inset-bottom)",
-      }}
-      aria-label="Main"
-    >
-      {TABS.map(({ href, label, Icon }) => {
-        const active = isActive(pathname, href);
-        return (
-          <Link
-            key={href}
-            href={href}
-            aria-current={active ? "page" : undefined}
-            className="flex flex-col items-center justify-center gap-1.5 py-3"
-            style={{
-              color: active ? "var(--tsi-text)" : "var(--tsi-muted)",
-              minHeight: 60,
-            }}
-          >
-            <Icon />
-            <span
-              className="text-[11px]"
-              style={{ fontWeight: active ? 700 : 500 }}
+    <nav className="tsi-tabbar" aria-label="Main">
+      <div className="tsi-tabbar-inner">
+        {TABS.map(({ href, label, Icon }) => {
+          const active = isActive(pathname, href);
+          return (
+            <Link
+              key={href}
+              href={href}
+              aria-current={active ? "page" : undefined}
+              className="tsi-tabbar-tab"
+              style={{ color: active ? "var(--tsi-text)" : "var(--tsi-muted)" }}
             >
-              {label}
-            </span>
-          </Link>
-        );
-      })}
+              <Icon />
+              <span
+                className="text-[11px] md:text-[13px]"
+                style={{ fontWeight: active ? 700 : 500 }}
+              >
+                {label}
+              </span>
+            </Link>
+          );
+        })}
+      </div>
     </nav>
   );
 }

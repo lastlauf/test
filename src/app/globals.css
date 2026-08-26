@@ -118,6 +118,59 @@ h3 {
     color: var(--tsi-muted);
   }
 
+  /*
+   * Tab bar. A phone gets a full-width bar pinned to the bottom edge; from
+   * tablet up it floats free as a pill only as wide as its five tabs, so a
+   * desktop window doesn't get a navigation bar stretched across a metre of
+   * screen.
+   */
+  .tsi-tabbar {
+    position: fixed;
+    z-index: 40;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--tsi-shell);
+    border-top: var(--tsi-rule) solid var(--tsi-line);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .tsi-tabbar-inner {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+  .tsi-tabbar-tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 60px;
+    padding: 12px 0;
+  }
+
+  @media (min-width: 768px) {
+    .tsi-tabbar {
+      left: 50%;
+      right: auto;
+      bottom: 24px;
+      transform: translateX(-50%);
+      border: var(--tsi-rule) solid var(--tsi-line);
+      border-radius: 999px;
+      padding-bottom: 0;
+      overflow: hidden;
+      box-shadow: 0 6px 22px rgb(0 0 0 / 0.12);
+    }
+    .tsi-tabbar-inner {
+      grid-template-columns: repeat(5, auto);
+    }
+    .tsi-tabbar-tab {
+      flex-direction: row;
+      gap: 9px;
+      min-height: 54px;
+      padding: 0 20px;
+    }
+  }
+
   .tsi-tap {
     min-height: 48px;
     min-width: 48px;

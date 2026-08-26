@@ -4,59 +4,9 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { TurkeyMark } from "./TurkeyMark";
 
-/**
- * The landing bird. Uses the mascot artwork in public/turkey.png when it is
- * there, and falls back to the drawn mark if it is missing or fails to load,
- * so the page never renders a broken image.
- */
-function HeroTurkey() {
-  const [artworkFailed, setArtworkFailed] = useState(false);
-  if (artworkFailed) return <TurkeyMark size={132} />;
-  return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src="/turkey.png"
-      alt="A turkey in a pilgrim hat holding a golf club beside a ball on a tee"
-      width={200}
-      height={180}
-      className="h-auto w-[200px]"
-      onError={() => setArtworkFailed(true)}
-    />
-  );
-}
-
 type Mode = "signin" | "create";
 
-function GoogleGlyph() {
-  return (
-    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden focusable="false">
-      <path
-        fill="#4285F4"
-        d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.8Z"
-      />
-      <path
-        fill="#34A853"
-        d="M12 24c3.2 0 5.9-1.1 7.9-2.9l-3.9-3a7.2 7.2 0 0 1-10.7-3.8H1.3v3.1A12 12 0 0 0 12 24Z"
-      />
-      <path
-        fill="#FBBC05"
-        d="M5.3 14.3a7.1 7.1 0 0 1 0-4.6V6.6H1.3a12 12 0 0 0 0 10.8l4-3.1Z"
-      />
-      <path
-        fill="#EA4335"
-        d="M12 4.8c1.8 0 3.4.6 4.6 1.8l3.5-3.5A12 12 0 0 0 1.3 6.6l4 3.1A7.2 7.2 0 0 1 12 4.8Z"
-      />
-    </svg>
-  );
-}
-
-export default function AuthPanel({
-  initialMode,
-  googleEnabled,
-}: {
-  initialMode: Mode;
-  googleEnabled: boolean;
-}) {
+export default function AuthPanel({ initialMode }: { initialMode: Mode }) {
   const router = useRouter();
   const [mode, setMode] = useState<Mode>(initialMode);
   const [form, setForm] = useState({
@@ -120,7 +70,7 @@ export default function AuthPanel({
       {/* Hero */}
       <div className="tsi-enter mb-6 text-center">
         <div className="mb-2 flex justify-center">
-          <HeroTurkey />
+          <TurkeyMark size={168} />
         </div>
         <h1 className="text-[26px] font-extrabold leading-tight">
           Turkey Slice Invitational
@@ -165,29 +115,6 @@ export default function AuthPanel({
               {option === "signin" ? "Sign in" : "Create account"}
             </button>
           ))}
-        </div>
-
-        {googleEnabled ? (
-          <a href="/api/auth/google" className="tsi-btn w-full">
-            <GoogleGlyph />
-            Continue with Google
-          </a>
-        ) : (
-          <div>
-            <button type="button" className="tsi-btn w-full" disabled style={{ opacity: 0.45 }}>
-              <GoogleGlyph />
-              Continue with Google
-            </button>
-            <p className="mt-2 text-center text-[13px] tsi-muted">
-              Google sign-in isn&apos;t switched on for this deployment yet.
-            </p>
-          </div>
-        )}
-
-        <div className="my-4 flex items-center gap-3" aria-hidden>
-          <span className="tsi-rule-t flex-1" />
-          <span className="text-[12px] font-medium tsi-muted">or</span>
-          <span className="tsi-rule-t flex-1" />
         </div>
 
         <form onSubmit={submit} className="space-y-3">
