@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { TurkeyMark } from "./TurkeyMark";
+import { HeroTurkey } from "./HeroTurkey";
 
 type Mode = "signin" | "create";
 
@@ -70,7 +70,7 @@ export default function AuthPanel({ initialMode }: { initialMode: Mode }) {
       {/* Hero */}
       <div className="tsi-enter mb-6 text-center">
         <div className="mb-2 flex justify-center">
-          <TurkeyMark size={168} />
+          <HeroTurkey size={168} />
         </div>
         <h1 className="text-[26px] font-extrabold leading-tight">
           Turkey Slice Invitational
