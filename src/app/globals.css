@@ -120,12 +120,9 @@ h3 {
 
   /*
    * Record-book tables. A phone can't show eight columns at once, so the table
-   * scrolls sideways inside its own panel rather than stretching the page.
+   * scrolls sideways inside its own panel rather than stretching the page — see
+   * the Scroller component, which fades whichever edge has more past it.
    */
-  .tsi-table-wrap {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
   .tsi-table {
     width: 100%;
     border-collapse: collapse;
@@ -295,6 +292,61 @@ h3 {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
+}
+
+/*
+ * The frame around a horizontal scroller. Its two gradients sit over whichever
+ * edge has content past it, so a cut-off table reads as cut off rather than as
+ * one that simply ends. Painted by the frame so a panel's border and corners
+ * stay sharp, and inert to the pointer so they never eat a tap or a swipe.
+ */
+.tsi-fade {
+  position: relative;
+  overflow: hidden;
+}
+.tsi-fade::before,
+.tsi-fade::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  width: 46px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms var(--ease-expo-out);
+}
+.tsi-fade::before {
+  left: 0;
+  background: linear-gradient(
+    to right,
+    var(--tsi-fade-bg, var(--tsi-shell)),
+    transparent
+  );
+}
+.tsi-fade::after {
+  right: 0;
+  background: linear-gradient(
+    to left,
+    var(--tsi-fade-bg, var(--tsi-shell)),
+    transparent
+  );
+}
+.tsi-fade[data-fade-start="true"]::before,
+.tsi-fade[data-fade-end="true"]::after {
+  opacity: 1;
+}
+/* Inside a panel the fade has to match the panel, not the page behind it. */
+.tsi-panel.tsi-fade,
+.tsi-fade.tsi-on-panel {
+  --tsi-fade-bg: var(--tsi-panel);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tsi-fade::before,
+  .tsi-fade::after {
+    transition: none;
+  }
 }
 
 @keyframes tsi-rise {

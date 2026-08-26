@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Scroller } from "@/components/Scroller";
 
 /**
  * The pills inside one tournament: scoped to a year, so they belong on the page
@@ -15,7 +16,7 @@ export function CupNav({ year }: { year: number }) {
     { href: `/cup/${year}/information`, label: "Information" },
   ];
   return (
-    <nav aria-label="Tournament" className="tsi-table-wrap -mx-5 mb-8 px-5">
+    <Scroller as="nav" ariaLabel="Tournament" className="-mx-5 mb-8" innerClassName="px-5">
       <ul className="flex gap-2">
         {links.map(({ href, label }) => {
           const active = pathname === href;
@@ -37,6 +38,6 @@ export function CupNav({ year }: { year: number }) {
           );
         })}
       </ul>
-    </nav>
+    </Scroller>
   );
 }

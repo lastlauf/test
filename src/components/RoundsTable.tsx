@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { RoundListRow } from "@/lib/cup";
+import { Scroller } from "@/components/Scroller";
 
 /**
  * The scoring sheet: one line per player per session, or per pair where the
@@ -64,7 +65,7 @@ export function RoundsTable({ rows }: { rows: RoundListRow[] }) {
         {shown.length} of {rows.length} rounds
       </p>
 
-      <div className="tsi-panel tsi-table-wrap !p-0">
+      <Scroller className="tsi-panel !p-0">
         <table className="tsi-table">
           <thead>
             <tr>
@@ -112,7 +113,7 @@ export function RoundsTable({ rows }: { rows: RoundListRow[] }) {
             )}
           </tbody>
         </table>
-      </div>
+      </Scroller>
     </>
   );
 }

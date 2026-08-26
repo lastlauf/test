@@ -1,5 +1,6 @@
 import type { Hole, MatchView } from "@/lib/payloads";
 import { subjectsForSide } from "@/lib/scoring";
+import { Scroller } from "@/components/Scroller";
 
 /** Full 18-hole card for one match — used in the archive and match views. */
 export function Scorecard({ match, holes }: { match: MatchView; holes: Hole[] }) {
@@ -11,7 +12,7 @@ export function Scorecard({ match, holes }: { match: MatchView; holes: Hole[] })
   const back = holes.filter((h) => h.number > 9);
 
   return (
-    <div className="tsi-scroll">
+    <Scroller className="tsi-on-panel">
       <table className="w-full min-w-[680px] border-collapse text-center">
         <thead>
           <tr>
@@ -98,6 +99,6 @@ export function Scorecard({ match, holes }: { match: MatchView; holes: Hole[] })
           })}
         </tbody>
       </table>
-    </div>
+    </Scroller>
   );
 }

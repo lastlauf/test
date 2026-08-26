@@ -6,6 +6,7 @@ import type { Player } from "@/lib/auth";
 import { DEFAULT_ALLOWANCE, type Format, sideName } from "@/lib/scoring";
 import type { CourseRow, EntryView, MatchView, RoundRow, TeamRow, TeeRow, TournamentRow } from "@/lib/tsi";
 import { Panel } from "./ui";
+import { Scroller } from "@/components/Scroller";
 
 const STANDARD_HOLES = [
   { par: 4, strokeIndex: 7 }, { par: 5, strokeIndex: 13 }, { par: 4, strokeIndex: 1 },
@@ -194,7 +195,7 @@ export default function Admin(props: Props) {
             />
           </div>
         </div>
-        <div className="tsi-scroll">
+        <Scroller className="tsi-on-panel">
           <table className="min-w-[640px] border-collapse text-center">
             <tbody>
               <tr>
@@ -243,7 +244,7 @@ export default function Admin(props: Props) {
               </tr>
             </tbody>
           </table>
-        </div>
+        </Scroller>
         <button
           type="button"
           className="tsi-btn w-full"

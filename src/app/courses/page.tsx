@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Empty, PageTitle } from "@/components/ui";
 import { currentPlayer } from "@/lib/auth";
 import { listCourseRows } from "@/lib/cup";
+import { Scroller } from "@/components/Scroller";
 
 export const dynamic = "force-dynamic";
 
@@ -42,7 +43,7 @@ export default async function CoursesPage() {
               )}
             </Empty>
           ) : (
-            <div className="tsi-panel tsi-table-wrap !p-0">
+            <Scroller className="tsi-panel !p-0">
               <table className="tsi-table">
                 <thead>
                   <tr>
@@ -86,7 +87,7 @@ export default async function CoursesPage() {
                   ))}
                 </tbody>
               </table>
-            </div>
+            </Scroller>
           )}
         </section>
       </div>

@@ -14,6 +14,7 @@ import {
 } from "@/lib/scoring";
 import { Panel } from "./ui";
 import { useOnline } from "./useLive";
+import { Scroller } from "@/components/Scroller";
 
 interface Draft {
   gross: number | null;
@@ -297,7 +298,7 @@ export default function ScoreEntry({
         </button>
       </div>
 
-      <div className="tsi-scroll -mx-1 px-1">
+      <Scroller className="-mx-1" innerClassName="px-1">
         <div className="flex gap-1 pb-1">
           {holes.map((h) => {
             const done = localState.results.find((r) => r.hole === h.number)?.winner != null;
@@ -320,7 +321,7 @@ export default function ScoreEntry({
             );
           })}
         </div>
-      </div>
+      </Scroller>
 
       {/* Your score — the one thing on this screen you can change */}
       {mine && myValue && (
@@ -520,7 +521,7 @@ function MiniCard({
   return (
     <Panel className="!p-0">
       <h2 className="tsi-rule-b px-5 py-3.5 text-[16px] font-bold">Card</h2>
-      <div className="tsi-scroll">
+      <Scroller className="tsi-on-panel">
         <table className="w-full min-w-[640px] border-collapse text-center">
           <thead>
             <tr>
@@ -600,7 +601,7 @@ function MiniCard({
             </tr>
           </tbody>
         </table>
-      </div>
+      </Scroller>
     </Panel>
   );
 }

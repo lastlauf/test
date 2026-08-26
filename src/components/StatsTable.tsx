@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { PlayerStatRow } from "@/lib/cup";
+import { Scroller } from "@/components/Scroller";
 
 type Column = {
   key: keyof PlayerStatRow | "name";
@@ -53,7 +54,7 @@ export function StatsTable({ rows }: { rows: PlayerStatRow[] }) {
 
   return (
     <>
-      <div className="tsi-panel tsi-table-wrap !p-0">
+      <Scroller className="tsi-panel !p-0">
         <table className="tsi-table">
           <thead>
             <tr>
@@ -112,7 +113,7 @@ export function StatsTable({ rows }: { rows: PlayerStatRow[] }) {
             )}
           </tbody>
         </table>
-      </div>
+      </Scroller>
 
       <ul className="mt-4 space-y-1.5">
         {COLUMNS.filter((c) => c.note).map((column) => (

@@ -4,6 +4,7 @@ import { Empty, PageTitle } from "@/components/ui";
 import { currentPlayer } from "@/lib/auth";
 import type { LedgerPayload } from "@/lib/payloads";
 import { sideName } from "@/lib/scoring";
+import { Scroller } from "@/components/Scroller";
 import {
   activeTournament,
   getRound,
@@ -67,7 +68,7 @@ export default async function BetsPage({
     <>
       <PageTitle kicker="Side action" title="Bets & ledger" />
       {rounds.length > 1 && (
-        <div className="tsi-scroll mb-4 -mx-1 px-1">
+        <Scroller className="mb-4 -mx-1" innerClassName="px-1">
           <div className="flex gap-2 pb-1">
             {rounds.map((item) => {
               const on = item.id === round.id;
@@ -88,7 +89,7 @@ export default async function BetsPage({
               );
             })}
           </div>
-        </div>
+        </Scroller>
       )}
       <Bets
         roundId={round.id}
