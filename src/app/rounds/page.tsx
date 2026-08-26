@@ -1,5 +1,4 @@
 import { RoundsTable } from "@/components/RoundsTable";
-import { SectionNav } from "@/components/SectionNav";
 import { PageTitle } from "@/components/ui";
 import { listRoundRows } from "@/lib/cup";
 
@@ -11,7 +10,6 @@ export default async function RoundsPage() {
   return (
     <>
       <PageTitle kicker="Record book" title="Rounds" />
-      <SectionNav />
 
       <div className="tsi-stack">
         <section>

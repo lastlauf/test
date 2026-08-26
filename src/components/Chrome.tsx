@@ -5,66 +5,16 @@ import { usePathname } from "next/navigation";
 
 /* Line icons, 22px, one stroke weight. */
 
-function IconLive() {
+function IconHome() {
   return (
     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden>
-      <circle cx="12" cy="12" r="3.2" fill="currentColor" />
       <path
-        d="M6.6 6.6a7.6 7.6 0 0 0 0 10.8M17.4 17.4a7.6 7.6 0 0 0 0-10.8"
+        d="M4 10.5 12 4l8 6.5V20H4v-9.5Z"
         stroke="currentColor"
         strokeWidth="1.9"
-        strokeLinecap="round"
+        strokeLinejoin="round"
       />
-    </svg>
-  );
-}
-
-function IconScore() {
-  return (
-    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden>
-      <rect
-        x="4"
-        y="3.5"
-        width="16"
-        height="17"
-        rx="2.5"
-        stroke="currentColor"
-        strokeWidth="1.9"
-      />
-      <path
-        d="M8 9h8M8 13h8M8 17h4"
-        stroke="currentColor"
-        strokeWidth="1.9"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function IconBets() {
-  return (
-    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden>
-      <circle cx="9" cy="9" r="5.5" stroke="currentColor" strokeWidth="1.9" />
-      <path
-        d="M14.2 5.4A5.5 5.5 0 1 1 9.8 18.6"
-        stroke="currentColor"
-        strokeWidth="1.9"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function IconPlayers() {
-  return (
-    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden>
-      <circle cx="12" cy="8.5" r="3.8" stroke="currentColor" strokeWidth="1.9" />
-      <path
-        d="M4.8 20a7.2 7.2 0 0 1 14.4 0"
-        stroke="currentColor"
-        strokeWidth="1.9"
-        strokeLinecap="round"
-      />
+      <path d="M10 20v-5h4v5" stroke="currentColor" strokeWidth="1.9" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -88,26 +38,91 @@ function IconCup() {
   );
 }
 
+function IconRounds() {
+  return (
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden>
+      <rect
+        x="4"
+        y="3.5"
+        width="16"
+        height="17"
+        rx="2.5"
+        stroke="currentColor"
+        strokeWidth="1.9"
+      />
+      <path
+        d="M8 9h8M8 13h8M8 17h4"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function IconStats() {
+  return (
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden>
+      <path
+        d="M5 20V12M12 20V4M19 20v-5"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function IconCourses() {
+  return (
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden>
+      <path
+        d="M7 20V4l10 3.5L7 11"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinejoin="round"
+      />
+      <path d="M4.5 20h6" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function IconArchive() {
+  return (
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden>
+      <rect x="3.5" y="4" width="17" height="4.5" rx="1.5" stroke="currentColor" strokeWidth="1.9" />
+      <path
+        d="M5.5 8.5V19a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1V8.5"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinejoin="round"
+      />
+      <path d="M10 12h4" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 const TABS = [
-  { href: "/", label: "Live", Icon: IconLive },
-  { href: "/games", label: "Games", Icon: IconScore },
-  { href: "/bets", label: "Bets", Icon: IconBets },
-  { href: "/players", label: "Players", Icon: IconPlayers },
-  { href: "/cup", label: "Cup", Icon: IconCup },
+  { href: "/", label: "Home", Icon: IconHome },
+  { href: "/cup", label: "Cups", Icon: IconCup },
+  { href: "/rounds", label: "Rounds", Icon: IconRounds },
+  { href: "/stats", label: "Stats", Icon: IconStats },
+  { href: "/courses", label: "Courses", Icon: IconCourses },
+  { href: "/archive", label: "Archive", Icon: IconArchive },
 ];
 
 function isActive(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
-  // Scorecards live under /score but belong to the Games tab.
-  if (href === "/games") return pathname.startsWith("/games") || pathname.startsWith("/score");
-  // Tournaments, rounds, stats and courses are all one section behind one tab.
-  if (href === "/cup") {
-    return ["/cup", "/rounds", "/stats", "/courses", "/archive"].some(
+  // The original app — live board, games, bets, scorecards, roster — all sits
+  // behind the archive tab.
+  if (href === "/archive") {
+    return ["/archive", "/games", "/bets", "/score", "/leaderboard", "/players"].some(
       (root) => pathname === root || pathname.startsWith(`${root}/`),
     );
   }
   return pathname === href || pathname.startsWith(`${href}/`);
 }
+
 
 export function TabBar() {
   const pathname = usePathname();

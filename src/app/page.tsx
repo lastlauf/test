@@ -1,95 +1,125 @@
 import Link from "next/link";
-import LiveTournament from "@/components/LiveTournament";
-import { PageTitle, Panel } from "@/components/ui";
-import { currentPlayer } from "@/lib/auth";
-import { FORMAT_GUIDES } from "@/lib/game-guides";
-import { listOpenGames } from "@/lib/games";
-import { activeTournament, buildBoard } from "@/lib/tsi";
+import { CupScoreboard, SessionBlock } from "@/components/Cup";
+import { Panel } from "@/components/ui";
+import { cupStandings, pointsToWin, tournamentSessions } from "@/lib/cup";
+import { activeTournament, listTournaments } from "@/lib/tsi";
 
 export const dynamic = "force-dynamic";
 
-export default async function HomePage() {
-  const [player, tournament, games] = await Promise.all([
-    currentPlayer(),
-    activeTournament(),
-    listOpenGames(),
-  ]);
+const SECTIONS = [
+  {
+    href: "/cup",
+    title: "Tournaments",
+    blurb: "Every cup by year, session by session.",
+  },
+  {
+    href: "/rounds",
+    title: "Rounds",
+    blurb: "Every card posted, with gross, strokes and net.",
+  },
+  {
+    href: "/stats",
+    title: "Stats",
+    blurb: "Lifetime records, points and birdies for every player.",
+  },
+  {
+    href: "/courses",
+    title: "Courses",
+    blurb: "Yardage, par, slope and rating for where we play.",
+  },
+];
 
-  if (tournament) {
-    const initial = await buildBoard(tournament);
-    return (
-      <>
-        <PageTitle
-          kicker={
-            tournament.status === "active"
-              ? "Playing now"
-              : tournament.status === "complete"
-                ? "Final"
-                : "Up next"
-          }
-          title={tournament.name}
-        />
-        <LiveTournament initial={initial} myPlayerId={player?.id ?? null} />
-      </>
-    );
-  }
+export default async function HomePage() {
+  // The cup being played, or the most recent one if nothing is live.
+  const active = await activeTournament();
+  const tournament = active ?? (await listTournaments())[0] ?? null;
+
+  const [teams, sessions] = tournament
+    ? await Promise.all([cupStandings(tournament.id), tournamentSessions(tournament)])
+    : [[], []];
+  const { available, played, needed } = pointsToWin(sessions);
+
+  // Anything still out on the course, else the last session played.
+  const live = sessions.filter((s) => s.matches.some((m) => !m.decided));
+  const showing = live.length > 0 ? live.slice(0, 1) : sessions.slice(-1);
 
   return (
     <>
-      <PageTitle kicker="Turkey Slice Invitational" title="Nothing on the tee yet" />
+      <div className="mb-8">
+        <p className="mb-1.5 text-[13px] font-semibold tsi-muted">
+          Turkey Slice Invitational
+        </p>
+        <h1>The record book</h1>
+        <p className="mt-3 max-w-[34rem] text-[16px] tsi-muted">
+          Every cup, every session, every card and what it did to your record.
+        </p>
+      </div>
 
       <div className="tsi-stack">
-        {games.length > 0 ? (
+        {tournament ? (
           <section>
-            <h2 className="mb-4">Games in play</h2>
-            <Panel className="!p-0">
-              <ul>
-                {games.map((game, i) => {
-                  const guide = FORMAT_GUIDES.find((g) => g.format === game.round.format);
-                  return (
-                    <li key={game.round.id} className={i > 0 ? "tsi-rule-t" : ""}>
-                      <Link href={`/score/${game.matchId}`} className="block px-5 py-4">
-                        <span className="flex items-baseline justify-between gap-3">
-                          <span className="text-[16px] font-semibold">
-                            {guide?.name ?? game.round.name}
-                          </span>
-                          <span className="text-[13px] tsi-muted">
-                            {game.players.length} of {game.capacity}
-                          </span>
-                        </span>
-                        <span className="mt-1 block truncate text-[14px] tsi-muted">
-                          {game.players.map((p) => p.displayName).join(" · ") ||
-                            "Waiting for players"}
-                        </span>
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
-            </Panel>
+            <div className="mb-4 flex items-end justify-between gap-4">
+              <h2>{tournament.name}</h2>
+              <Link
+                href={`/cup/${tournament.year}`}
+                className="shrink-0 text-[14px] font-semibold underline"
+              >
+                Full card
+              </Link>
+            </div>
+            {teams.length > 0 && <CupScoreboard teams={teams} needed={needed} />}
+            <p className="mt-2 text-center text-[13px] tsi-muted">
+              {played} of {available} matches decided
+            </p>
           </section>
         ) : (
           <Panel className="!py-10 text-center">
-            <p className="text-[16px] font-semibold">No games have been started.</p>
-            <p className="mx-auto mt-2 max-w-[22rem] text-[15px] tsi-muted">
-              Anyone with an account can start one — pick a format, and the rest of the
-              group joins from their own phones.
+            <p className="text-[16px] font-semibold">No cup on the books yet.</p>
+            <p className="mx-auto mt-2 max-w-[24rem] text-[15px] tsi-muted">
+              Once a tournament is set up, the score and every session land here.
             </p>
           </Panel>
         )}
 
-        <Link href="/games" className="tsi-btn tsi-btn-primary w-full">
-          {games.length > 0 ? "Start or join a game" : "Start a game"}
-        </Link>
+        {showing.map((session) => (
+          <SessionBlock key={session.round.id} session={session} />
+        ))}
 
-        {!player && (
-          <p className="text-center text-[15px] tsi-muted">
-            <Link href="/login" className="underline">
-              Sign in
-            </Link>{" "}
-            to play. You can watch without an account.
-          </p>
-        )}
+        <section>
+          <h2 className="mb-4">The record book</h2>
+          <div className="tsi-stack-tight">
+            {SECTIONS.map((section) => (
+              <Link key={section.href} href={section.href} className="block">
+                <Panel className="flex items-center justify-between gap-4">
+                  <span className="min-w-0">
+                    <span className="block text-[17px] font-bold">{section.title}</span>
+                    <span className="mt-0.5 block text-[14px] tsi-muted">
+                      {section.blurb}
+                    </span>
+                  </span>
+                  <span aria-hidden className="shrink-0 text-[18px] font-bold">
+                    →
+                  </span>
+                </Panel>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section>
+          <Panel>
+            <h3>Playing today?</h3>
+            <p className="mt-2 text-[15px] tsi-muted">
+              Live scoring, the games you start from your phone and the side-bet ledger
+              are all still here — they live in the archive now.
+            </p>
+            <p className="mt-4">
+              <Link href="/archive" className="text-[14px] font-semibold underline">
+                Open the archive
+              </Link>
+            </p>
+          </Panel>
+        </section>
       </div>
     </>
   );

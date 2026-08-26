@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { SectionNav } from "@/components/SectionNav";
 import { PageTitle, Panel, Stat } from "@/components/ui";
 import { currentPlayer } from "@/lib/auth";
 import { getCourseDetail } from "@/lib/cup";
@@ -34,7 +33,6 @@ export default async function CoursePage({
           ) : undefined
         }
       />
-      <SectionNav />
 
       <div className="tsi-stack">
         <section>

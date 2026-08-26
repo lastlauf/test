@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { SectionNav } from "@/components/SectionNav";
 import { Empty, PageTitle } from "@/components/ui";
 import { currentPlayer } from "@/lib/auth";
 import { listCourseRows } from "@/lib/cup";
@@ -22,7 +21,6 @@ export default async function CoursesPage() {
           ) : undefined
         }
       />
-      <SectionNav />
 
       <div className="tsi-stack">
         <section>

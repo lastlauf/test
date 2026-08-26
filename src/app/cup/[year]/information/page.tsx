@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CupNav } from "@/components/SectionNav";
+import { CupNav } from "@/components/CupNav";
 import { Empty, PageTitle, Panel, Stat } from "@/components/ui";
 import { cupStandings, pointsToWin, tournamentSessions } from "@/lib/cup";
 import { FORMAT_GUIDES } from "@/lib/game-guides";

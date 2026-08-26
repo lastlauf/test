@@ -180,7 +180,7 @@ h3 {
   }
   .tsi-tabbar-inner {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr));
   }
   .tsi-tabbar-tab {
     display: flex;
@@ -189,7 +189,7 @@ h3 {
     justify-content: center;
     gap: 6px;
     min-height: 60px;
-    padding: 12px 0;
+    padding: 12px 2px;
   }
 
   @media (min-width: 768px) {
@@ -205,13 +205,13 @@ h3 {
       box-shadow: 0 6px 22px rgb(0 0 0 / 0.12);
     }
     .tsi-tabbar-inner {
-      grid-template-columns: repeat(5, auto);
+      grid-template-columns: repeat(6, auto);
     }
     .tsi-tabbar-tab {
       flex-direction: row;
       gap: 9px;
       min-height: 54px;
-      padding: 0 20px;
+      padding: 0 16px;
     }
   }
 

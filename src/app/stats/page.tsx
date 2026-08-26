@@ -1,4 +1,3 @@
-import { SectionNav } from "@/components/SectionNav";
 import { StatsTable } from "@/components/StatsTable";
 import { PageTitle } from "@/components/ui";
 import { allPlayerStats } from "@/lib/cup";
@@ -12,7 +11,6 @@ export default async function StatsPage() {
   return (
     <>
       <PageTitle kicker="Record book" title="Stats" />
-      <SectionNav />
 
       <div className="tsi-stack">
         <section>

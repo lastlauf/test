@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Avatar } from "@/components/Avatar";
-import { CupNav } from "@/components/SectionNav";
+import { CupNav } from "@/components/CupNav";
 import { Empty, PageTitle, Panel, TeamDot } from "@/components/ui";
 import { cupRecords, tournamentSessions } from "@/lib/cup";
 import { getTournamentByYear, listEntries, listTeams } from "@/lib/tsi";

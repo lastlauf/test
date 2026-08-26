@@ -1,6 +1,5 @@
 import { notFound, redirect } from "next/navigation";
 import { CourseForm } from "@/components/CourseForm";
-import { SectionNav } from "@/components/SectionNav";
 import { PageTitle, Panel } from "@/components/ui";
 import { currentPlayer } from "@/lib/auth";
 import { getCourseDetail } from "@/lib/cup";
@@ -22,7 +21,6 @@ export default async function EditCoursePage({
   return (
     <>
       <PageTitle kicker="Courses" title={`Edit ${detail.course.name}`} />
-      <SectionNav />
       <Panel>
         <CourseForm
           courseId={id}

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CupScoreboard, SessionBlock } from "@/components/Cup";
-import { CupNav } from "@/components/SectionNav";
+import { CupNav } from "@/components/CupNav";
 import { Empty, PageTitle } from "@/components/ui";
 import { cupStandings, pointsToWin, tournamentSessions } from "@/lib/cup";
 import { getTournamentByYear } from "@/lib/tsi";

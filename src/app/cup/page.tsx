@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { SectionNav } from "@/components/SectionNav";
 import { Empty, PageTitle, Panel } from "@/components/ui";
 import { FORMAT_GUIDES } from "@/lib/game-guides";
 import { listArchivedGames } from "@/lib/games";
@@ -19,7 +18,6 @@ export default async function CupPage() {
   return (
     <>
       <PageTitle kicker="Record book" title="Tournaments" />
-      <SectionNav />
 
       <div className="tsi-stack">
         <section>
