@@ -15,6 +15,11 @@ let instance: Pool | null = null;
  * anyone having to copy a second copy of the same credential.
  */
 const CONNECTION_VARS = [
+  // Checked first so a deployment can carry its own connection string past a
+  // platform variable that exists but is blank: an empty project-level
+  // variable still occupies the name, and .env files do not override a key
+  // that is already present in the environment.
+  "TSI_DATABASE_URL",
   "DATABASE_URL",
   "POSTGRES_URL",
   "POSTGRES_URL_NON_POOLING",
