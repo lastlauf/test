@@ -4,6 +4,27 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { TurkeyMark } from "./TurkeyMark";
 
+/**
+ * The landing bird. Uses the mascot artwork in public/turkey.png when it is
+ * there, and falls back to the drawn mark if it is missing or fails to load,
+ * so the page never renders a broken image.
+ */
+function HeroTurkey() {
+  const [artworkFailed, setArtworkFailed] = useState(false);
+  if (artworkFailed) return <TurkeyMark size={132} />;
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src="/turkey.png"
+      alt="A turkey in a pilgrim hat holding a golf club beside a ball on a tee"
+      width={200}
+      height={180}
+      className="h-auto w-[200px]"
+      onError={() => setArtworkFailed(true)}
+    />
+  );
+}
+
 type Mode = "signin" | "create";
 
 function GoogleGlyph() {
@@ -98,8 +119,8 @@ export default function AuthPanel({
     <div className="mx-auto w-full max-w-sm">
       {/* Hero */}
       <div className="tsi-enter mb-6 text-center">
-        <div className="mb-1 flex justify-center">
-          <TurkeyMark size={132} />
+        <div className="mb-2 flex justify-center">
+          <HeroTurkey />
         </div>
         <h1 className="text-[26px] font-extrabold leading-tight">
           Turkey Slice Invitational
