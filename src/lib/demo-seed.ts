@@ -9,8 +9,17 @@
 
 import { randomBytes, scryptSync } from "node:crypto";
 
+const counters = new Map<string, number>();
+
+/**
+ * Deterministic ids (crs1, plr3, mch12). Re-running the seed produces exactly
+ * the same rows, and the emitted SQL is a fraction of the size that random
+ * UUIDs would make it.
+ */
 function uid(prefix: string): string {
-  return `${prefix}_${crypto.randomUUID().replace(/-/g, "").slice(0, 16)}`;
+  const next = (counters.get(prefix) ?? 0) + 1;
+  counters.set(prefix, next);
+  return `${prefix}${next}`;
 }
 
 export const DEMO_PASSWORD = process.env.TSI_DEMO_PASSWORD ?? "TurkeySlice2026!";
@@ -22,6 +31,7 @@ export interface SeedScript {
 }
 
 export function buildSeedSql(): SeedScript {
+  counters.clear();
   const statements: string[] = [];
 
   function lit(value: unknown): string {
@@ -30,10 +40,33 @@ export function buildSeedSql(): SeedScript {
     return `'${String(value).replace(/'/g, "''")}'`;
   }
 
+  const buckets = new Map<string, { columns: string[]; rows: string[] }>();
+
   function insert(table: string, columns: string[], values: unknown[]) {
-    statements.push(
-      `INSERT INTO ${table} (${columns.join(", ")}) VALUES (${values.map(lit).join(", ")});`,
-    );
+    const bucket = buckets.get(table) ?? { columns, rows: [] };
+    bucket.rows.push(`(${values.map(lit).join(", ")})`);
+    buckets.set(table, bucket);
+  }
+
+  // Parents before children, so one pass satisfies every foreign key.
+  const TABLE_ORDER = [
+    "courses", "tees", "holes", "players", "tournaments", "teams", "entries",
+    "rounds", "matches", "match_sides", "side_players", "scores", "wagers",
+    "wager_players",
+  ];
+
+  function flush() {
+    for (const table of TABLE_ORDER) {
+      const bucket = buckets.get(table);
+      if (!bucket || bucket.rows.length === 0) continue;
+      // Chunked so no single statement grows unwieldy for a SQL console.
+      for (let i = 0; i < bucket.rows.length; i += 250) {
+        const chunk = bucket.rows.slice(i, i + 250);
+        statements.push(
+          `INSERT INTO ${table} (${bucket.columns.join(", ")}) VALUES\n${chunk.join(",\n")};`,
+        );
+      }
+    }
   }
 
   function hash(password: string): string {
@@ -377,6 +410,8 @@ export function buildSeedSql(): SeedScript {
     insertWagerPlayer([h2hId, playerIds["rwhitlock"]]);
   }
 
+
+  flush();
 
   return {
     sql: statements.join("\n"),
