@@ -6,6 +6,8 @@ import { useState } from "react";
 import { BET_GUIDES, FORMAT_GUIDES } from "@/lib/game-guides";
 import type { GameSummary } from "@/lib/games";
 import type { Format } from "@/lib/scoring";
+import Celebration from "./Celebration";
+import { ConfirmAction } from "./Confirm";
 import { Panel } from "./ui";
 
 function Chevron({ open }: { open: boolean }) {
@@ -34,6 +36,7 @@ export default function Games({
   const [openGuide, setOpenGuide] = useState<Format | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [celebrating, setCelebrating] = useState<{ name: string; href: string } | null>(null);
 
   const act = async (label: string, run: () => Promise<Response>) => {
     setBusy(label);
@@ -59,14 +62,17 @@ export default function Games({
   };
 
   const start = async (format: Format) => {
-    const body = await act(`start-${format}`, () =>
+    const body = (await act(`start-${format}`, () =>
       fetch("/api/games", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ format }),
       }),
-    );
-    if (body?.matchId) router.push(`/score/${body.matchId}`);
+    )) as { roundId?: string; matchId?: string } | null;
+    if (body?.roundId) {
+      const guide = FORMAT_GUIDES.find((g) => g.format === format);
+      setCelebrating({ name: guide?.name ?? "Game", href: `/games/${body.roundId}` });
+    }
   };
 
   const join = async (game: GameSummary) => {
@@ -81,8 +87,25 @@ export default function Games({
       fetch(`/api/games/${game.round.id}/archive`, { method: "POST" }),
     );
 
+  const remove = async (game: GameSummary) =>
+    act(`delete-${game.round.id}`, () =>
+      fetch(`/api/games/${game.round.id}`, { method: "DELETE" }),
+    );
+
   return (
     <div className="tsi-stack">
+      {celebrating && (
+        <Celebration
+          title="Game on"
+          subtitle={`${celebrating.name} started — send the others in to join`}
+          onDone={() => {
+            const href = celebrating.href;
+            setCelebrating(null);
+            router.push(href);
+          }}
+        />
+      )}
+
       {error && (
         <p className="tsi-rule rounded-xl px-4 py-3 text-[15px] font-semibold">{error}</p>
       )}
@@ -98,7 +121,11 @@ export default function Games({
               return (
                 <Panel key={game.round.id} className="!p-5">
                   <div className="flex items-baseline justify-between gap-3">
-                    <h3>{guide?.name ?? game.round.name}</h3>
+                    <h3>
+                      <Link href={`/games/${game.round.id}`}>
+                        {guide?.name ?? game.round.name}
+                      </Link>
+                    </h3>
                     <span className="text-[13px] tsi-muted">
                       {game.players.length} of {game.capacity}
                     </span>
@@ -127,8 +154,8 @@ export default function Games({
 
                   <div className="mt-5 flex flex-wrap gap-3">
                     {mine ? (
-                      <Link href={`/score/${game.matchId}`} className="tsi-btn tsi-btn-primary flex-1">
-                        Open scorecard
+                      <Link href={`/games/${game.round.id}`} className="tsi-btn tsi-btn-primary flex-1">
+                        Open game
                       </Link>
                     ) : game.full ? (
                       <Link href={`/score/${game.matchId}`} className="tsi-btn flex-1">
@@ -144,21 +171,28 @@ export default function Games({
                         {busy === `join-${game.round.id}` ? "Joining…" : "Join this game"}
                       </button>
                     )}
-                    {isCreator && (
-                      <button
-                        type="button"
-                        className="tsi-btn"
-                        disabled={busy === `archive-${game.round.id}`}
-                        onClick={() => archive(game)}
-                      >
-                        {busy === `archive-${game.round.id}` ? "Archiving…" : "Archive"}
-                      </button>
-                    )}
                   </div>
+
                   {isCreator && (
-                    <p className="mt-3 text-[13px] tsi-muted">
-                      You started this game, so you can archive it when it is done.
-                    </p>
+                    <div className="mt-4 tsi-stack-tight">
+                      <ConfirmAction
+                        className="w-full"
+                        label="Archive"
+                        question="Archive this game? It stops accepting scores and moves to the archive, where you can still open the scorecard."
+                        confirmLabel="Yes, archive it"
+                        busyLabel="Archiving…"
+                        onConfirm={() => archive(game)}
+                      />
+                      <ConfirmAction
+                        className="w-full"
+                        tone="danger"
+                        label="Delete"
+                        question="Delete this game for good? The scores, the players and every bet on it go with it. This cannot be undone."
+                        confirmLabel="Yes, delete it"
+                        busyLabel="Deleting…"
+                        onConfirm={() => remove(game)}
+                      />
+                    </div>
                   )}
                 </Panel>
               );
@@ -249,8 +283,8 @@ export default function Games({
       <section>
         <h2 className="mb-2">Side bets</h2>
         <p className="mb-5 text-[15px] tsi-muted">
-          Money games that ride on top of whatever format you are playing. Add one from
-          the Bets tab once a game is under way.
+          Money games that ride on top of whatever format you are playing. Open a game
+          and add one there — every bet settles off that game&apos;s scores.
         </p>
         <Panel className="!p-0">
           <ul>

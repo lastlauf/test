@@ -175,3 +175,45 @@ test("settlements are reduced to the fewest payments", () => {
     { from: "a", to: "b", amount: 10 },
   ]);
 });
+
+test("a match bet pays only once the result is decided", () => {
+  const context = nassauContext();
+  context.wagers = [
+    { id: "w1", type: "match", amount: 40, matchId: "m1", settings: {}, playerIds: [] },
+  ];
+  const ledger = computeLedger(context);
+  // Front nine to a, back nine to b, so the match itself is all square.
+  assert.match(ledger.results[0].lines[0], /halved/);
+  assert.equal(ledger.total, 0);
+});
+
+test("a match bet splits the stake across the winning side", () => {
+  const a = [3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4];
+  const b = Array(18).fill(4);
+  const ledger = computeLedger({
+    holes: HOLES,
+    format: "fourball",
+    allowance: 1,
+    matches: [
+      {
+        id: "m1",
+        name: "Match 1",
+        sides: [side("A", ["a", "a2"]), side("B", ["b", "b2"])],
+        scores: [
+          ...rows("a", a),
+          ...rows("a2", Array(18).fill(9)),
+          ...rows("b", b),
+          ...rows("b2", Array(18).fill(9)),
+        ],
+      },
+    ],
+    wagers: [
+      { id: "w1", type: "match", amount: 40, matchId: "m1", settings: {}, playerIds: [] },
+    ],
+    players: scratch(["a", "a2", "b", "b2"]),
+  });
+  assert.equal(ledger.total, 40);
+  // Each loser pays 20, split 10 to each winner: the pot stays at the stake.
+  assert.equal(ledger.results[0].transfers.every((t) => t.amount === 10), true);
+  assert.equal(ledger.results[0].transfers.length, 4);
+});

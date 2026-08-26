@@ -34,15 +34,21 @@ export async function POST(
   const body = await readJson<Body>(request);
   const amount = Number(body.amount);
   if (!Number.isFinite(amount) || amount <= 0) return fail("Enter a stake above zero.");
-  if (!["nassau", "skins", "h2h"].includes(body.type)) return fail("Unknown wager type.");
+  if (!["match", "nassau", "skins", "h2h"].includes(body.type)) {
+    return fail("Unknown wager type.");
+  }
 
   const matches = await listMatchViews(round.id);
   const playerIds = [...new Set(body.playerIds ?? [])];
 
-  if (body.type === "nassau") {
-    if (!body.matchId || !matches.some((m) => m.id === body.matchId)) {
-      return fail("Pick the match this Nassau is played in.");
-    }
+  // Match and Nassau bets ride on one specific match; a game has exactly one,
+  // so fall back to it rather than making the caller name it.
+  const matchId =
+    body.type === "match" || body.type === "nassau"
+      ? (body.matchId ?? (matches.length === 1 ? matches[0].id : null))
+      : null;
+  if ((body.type === "match" || body.type === "nassau") && !matches.some((m) => m.id === matchId)) {
+    return fail("Pick the match this bet is played in.");
   }
   if (body.type === "skins" && playerIds.length < 2) {
     return fail("Skins needs at least two players.");
@@ -58,7 +64,7 @@ export async function POST(
       [
         wagerId,
         round.id,
-        body.type === "nassau" ? body.matchId : null,
+        matchId,
         body.type,
         amount,
         JSON.stringify(body.settings ?? {}),

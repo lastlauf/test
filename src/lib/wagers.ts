@@ -15,9 +15,10 @@ import {
   strokesOnHole,
 } from "./scoring";
 
-export type WagerType = "nassau" | "skins" | "h2h";
+export type WagerType = "match" | "nassau" | "skins" | "h2h";
 
 export const WAGER_LABEL: Record<WagerType, string> = {
+  match: "Match",
   nassau: "Nassau",
   skins: "Skins",
   h2h: "Head-to-head",
@@ -147,6 +148,46 @@ function segmentState(
     else if (nb < na) differential -= 1;
   }
   return { differential, played, holes: slice.length };
+}
+
+/** One stake on the outright result: who wins the match, full stop. */
+function matchResult(
+  wager: WagerDef,
+  ctx: LedgerContext,
+  match: MatchContext,
+): WagerResult {
+  const state = matchState(ctx.holes, match.sides, match.scores, ctx.format, ctx.allowance);
+  const [a, b] = match.sides;
+  const teamA = a?.players.map((p) => p.id) ?? [];
+  const teamB = b?.players.map((p) => p.id) ?? [];
+  const lines: string[] = [];
+  const transfers: Transfer[] = [];
+
+  if (!state.decided) {
+    lines.push(state.thru === 0 ? "Not started" : `${state.status} — not settled`);
+  } else if (state.winner === "halved") {
+    lines.push("Match halved — no money");
+  } else {
+    const winnerIsA = state.winner === a?.id;
+    lines.push(`${state.status} — ${money(wager.amount)}`);
+    transfers.push(
+      ...splitTransfers(
+        winnerIsA ? teamB : teamA,
+        winnerIsA ? teamA : teamB,
+        wager.amount,
+        "Match",
+      ),
+    );
+  }
+
+  return {
+    wagerId: wager.id,
+    type: "match",
+    title: `Match · ${sideLabel(a)} v ${sideLabel(b)} · ${money(wager.amount)}`,
+    lines,
+    transfers,
+    pending: !state.decided,
+  };
 }
 
 function nassauResult(
@@ -410,7 +451,11 @@ export function simplify(
 export function computeLedger(ctx: LedgerContext): Ledger {
   const results: WagerResult[] = [];
   for (const wager of ctx.wagers) {
-    if (wager.type === "nassau") {
+    if (wager.type === "match") {
+      const match = ctx.matches.find((m) => m.id === wager.matchId) ?? ctx.matches[0];
+      if (!match) continue;
+      results.push(matchResult(wager, ctx, match));
+    } else if (wager.type === "nassau") {
       const match = ctx.matches.find((m) => m.id === wager.matchId);
       if (!match) continue;
       results.push(nassauResult(wager, ctx, match));

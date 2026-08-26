@@ -5,6 +5,14 @@ import { useState } from "react";
 import type { LedgerPayload, WagerDef } from "@/lib/payloads";
 import { shortName } from "@/lib/scoring";
 import { WAGER_LABEL, type WagerType } from "@/lib/wagers";
+
+/** What each bet actually settles on, in one line, at the point of choosing. */
+const WAGER_CRITERIA: Record<WagerType, string> = {
+  match: "One stake on the outright result — whoever wins the match takes it. A halved match pays nobody.",
+  nassau: "Three stakes in one: the front nine, the back nine and the full eighteen, each settled separately.",
+  skins: "Every hole is worth the stake. Lowest score wins it outright; a tie carries the value to the next hole.",
+  h2h: "A private match between two players inside the group, settled on net scores.",
+};
 import { useLive } from "./useLive";
 import { Panel } from "./ui";
 
@@ -64,8 +72,8 @@ export default function Bets({
         body: JSON.stringify({
           type,
           amount: Number(amount),
-          matchId: type === "nassau" ? matchId : null,
-          playerIds: type === "nassau" ? [] : selected,
+          matchId: type === "nassau" || type === "match" ? matchId : null,
+          playerIds: type === "skins" || type === "h2h" ? selected : [],
           settings: type === "skins" ? { mode, carryover } : {},
         }),
       });
@@ -168,13 +176,14 @@ export default function Bets({
       {canEdit && (
         <Panel className="space-y-3">
           <h2>Add a bet</h2>
-          <div className="grid grid-cols-3 gap-1 rounded-xl tsi-rule p-1">
-            {(["nassau", "skins", "h2h"] as WagerType[]).map((option) => (
+          <div className="flex flex-wrap gap-2">
+            {(["match", "nassau", "skins", "h2h"] as WagerType[]).map((option) => (
               <button
                 key={option}
                 type="button"
                 onClick={() => setType(option)}
-                className="tsi-tap rounded-lg text-[14px]"
+                aria-pressed={type === option}
+                className="rounded-full tsi-rule px-4 py-2.5 text-[14px]"
                 style={{
                   background: type === option ? "var(--tsi-text)" : "transparent",
                   color: type === option ? "var(--tsi-shell)" : "var(--tsi-text)",
@@ -186,13 +195,17 @@ export default function Bets({
             ))}
           </div>
 
+          <p className="text-[14px] tsi-muted">{WAGER_CRITERIA[type]}</p>
+
           <div>
             <label className="tsi-label" htmlFor="stake">
               {type === "nassau"
                 ? "Stake per segment"
                 : type === "skins"
                   ? "Per skin, per player"
-                  : "Stake"}
+                  : type === "match"
+                    ? "Stake on the result"
+                    : "Stake"}
             </label>
             <input
               id="stake"
@@ -203,7 +216,7 @@ export default function Bets({
             />
           </div>
 
-          {type === "nassau" && (
+          {(type === "nassau" || type === "match") && matches.length > 1 && (
             <div>
               <label className="tsi-label" htmlFor="match">
                 Match
@@ -223,7 +236,7 @@ export default function Bets({
             </div>
           )}
 
-          {type !== "nassau" && (
+          {(type === "skins" || type === "h2h") && (
             <div>
               <span className="tsi-label">
                 {type === "h2h" ? "Pick exactly two" : "Players in"}
