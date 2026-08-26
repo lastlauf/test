@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import "./globals.css";
-import { SunToggle, TabBar } from "@/components/Chrome";
+import { TabBar } from "@/components/Chrome";
 import { LogoMark } from "@/components/TurkeyMark";
 import { currentPlayer } from "@/lib/auth";
 
@@ -27,23 +27,15 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body>
-        <script
-          // Apply the sunlight preference before paint so the screen never flashes.
-          dangerouslySetInnerHTML={{
-            __html:
-              "try{document.documentElement.dataset.sun=localStorage.getItem('tsi.sun')==='on'?'on':'off'}catch(e){}",
-          }}
-        />
         <header
-          className="tsi-rule-b sticky top-0 z-40 flex items-center gap-3 px-4 py-2.5"
+          className="tsi-rule-b sticky top-0 z-40 flex items-center gap-3 px-5 py-3"
           style={{ background: "var(--tsi-shell)" }}
         >
           <Link href="/" className="flex items-center gap-2">
             <LogoMark size={30} />
             <span className="text-lg font-extrabold tracking-tight">TSI</span>
           </Link>
-          <div className="ml-auto flex items-center gap-1">
-            <SunToggle />
+          <div className="ml-auto flex items-center">
             <Link
               href={player ? "/me" : "/login"}
               className="tsi-tap flex items-center px-2 text-[15px] font-semibold"
@@ -53,7 +45,7 @@ export default async function RootLayout({
             </Link>
           </div>
         </header>
-        <main className="mx-auto w-full max-w-3xl px-4 pb-28 pt-5">{children}</main>
+        <main className="mx-auto w-full max-w-3xl px-5 pb-32 pt-8">{children}</main>
         <TabBar />
       </body>
     </html>

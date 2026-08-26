@@ -81,9 +81,11 @@ CREATE TABLE IF NOT EXISTS entries (
   PRIMARY KEY (tournament_id, player_id)
 );
 
+-- A round belongs to a tournament, or stands alone as a game someone started
+-- from the app: tournament_id is null and created_by names the starter.
 CREATE TABLE IF NOT EXISTS rounds (
   id            text PRIMARY KEY,
-  tournament_id text NOT NULL REFERENCES tournaments(id) ON DELETE CASCADE,
+  tournament_id text REFERENCES tournaments(id) ON DELETE CASCADE,
   name          text NOT NULL,
   format        text NOT NULL,             -- fourball | foursome | singles
   course_id     text NOT NULL REFERENCES courses(id),
@@ -91,7 +93,8 @@ CREATE TABLE IF NOT EXISTS rounds (
   played_on     text,
   sequence      integer NOT NULL DEFAULT 1,
   allowance     double precision NOT NULL DEFAULT 1,
-  status        text NOT NULL DEFAULT 'upcoming'
+  status        text NOT NULL DEFAULT 'upcoming',  -- open | live | complete | archived
+  created_by    text REFERENCES players(id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS matches (
@@ -152,3 +155,8 @@ CREATE INDEX IF NOT EXISTS idx_matches_round ON matches(round_id);
 CREATE INDEX IF NOT EXISTS idx_rounds_tournament ON rounds(tournament_id);
 CREATE INDEX IF NOT EXISTS idx_sessions_player ON sessions(player_id);
 CREATE INDEX IF NOT EXISTS idx_side_players_player ON side_players(player_id);
+
+-- Migrations for databases created before games existed.
+ALTER TABLE rounds ALTER COLUMN tournament_id DROP NOT NULL;
+ALTER TABLE rounds ADD COLUMN IF NOT EXISTS created_by text REFERENCES players(id) ON DELETE SET NULL;
+CREATE INDEX IF NOT EXISTS idx_rounds_created_by ON rounds(created_by);

@@ -11,12 +11,12 @@ export function PageTitle({
   action?: ReactNode;
 }) {
   return (
-    <div className="mb-5 flex items-end justify-between gap-3">
+    <div className="mb-8 flex items-end justify-between gap-4">
       <div className="min-w-0">
         {kicker && (
-          <p className="mb-0.5 text-[12px] font-semibold tsi-muted">{kicker}</p>
+          <p className="mb-1.5 text-[13px] font-semibold tsi-muted">{kicker}</p>
         )}
-        <h1 className="text-[26px] font-extrabold leading-[1.1]">{title}</h1>
+        <h1>{title}</h1>
       </div>
       {action}
     </div>
@@ -30,13 +30,13 @@ export function Panel({
   children: ReactNode;
   className?: string;
 }) {
-  return <section className={`tsi-panel p-4 ${className}`}>{children}</section>;
+  return <section className={`tsi-panel p-5 ${className}`}>{children}</section>;
 }
 
 export function Empty({ children }: { children: ReactNode }) {
   return (
-    <Panel className="text-center">
-      <p className="tsi-muted">{children}</p>
+    <Panel className="!py-10 text-center">
+      <p className="text-[15px] tsi-muted">{children}</p>
     </Panel>
   );
 }
@@ -132,10 +132,10 @@ export function Stat({
   sub?: ReactNode;
 }) {
   return (
-    <div className="tsi-panel px-3 py-3">
-      <p className="text-[12px] font-semibold tsi-muted">{label}</p>
-      <p className="tsi-num text-[26px] font-extrabold leading-tight">{value}</p>
-      {sub && <p className="text-[12px] tsi-muted">{sub}</p>}
+    <div className="tsi-panel px-4 py-4">
+      <p className="text-[13px] font-semibold tsi-muted">{label}</p>
+      <p className="tsi-num mt-1 text-[28px] font-extrabold leading-tight">{value}</p>
+      {sub && <p className="mt-0.5 text-[13px] tsi-muted">{sub}</p>}
     </div>
   );
 }

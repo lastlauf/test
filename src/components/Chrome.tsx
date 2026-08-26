@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
 
 /* Line icons, 22px, one stroke weight. */
 
@@ -91,7 +90,7 @@ function IconArchive() {
 
 const TABS = [
   { href: "/", label: "Live", Icon: IconLive },
-  { href: "/score", label: "Score", Icon: IconScore },
+  { href: "/games", label: "Games", Icon: IconScore },
   { href: "/bets", label: "Bets", Icon: IconBets },
   { href: "/players", label: "Players", Icon: IconPlayers },
   { href: "/archive", label: "Archive", Icon: IconArchive },
@@ -99,51 +98,9 @@ const TABS = [
 
 function isActive(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
+  // Scorecards live under /score but belong to the Games tab.
+  if (href === "/games") return pathname.startsWith("/games") || pathname.startsWith("/score");
   return pathname === href || pathname.startsWith(`${href}/`);
-}
-
-export function SunToggle() {
-  const [on, setOn] = useState(false);
-
-  useEffect(() => {
-    const stored = window.localStorage.getItem("tsi.sun") === "on";
-    setOn(stored);
-    document.documentElement.dataset.sun = stored ? "on" : "off";
-  }, []);
-
-  return (
-    <button
-      type="button"
-      className="tsi-tap flex items-center justify-center rounded-full"
-      aria-pressed={on}
-      aria-label={on ? "Sunlight mode on" : "Sunlight mode off"}
-      title="Sunlight mode"
-      style={{
-        background: on ? "var(--tsi-text)" : "transparent",
-        color: on ? "var(--tsi-shell)" : "var(--tsi-muted)",
-        width: 40,
-        height: 40,
-        minWidth: 40,
-        minHeight: 40,
-      }}
-      onClick={() => {
-        const next = !on;
-        setOn(next);
-        document.documentElement.dataset.sun = next ? "on" : "off";
-        window.localStorage.setItem("tsi.sun", next ? "on" : "off");
-      }}
-    >
-      <svg viewBox="0 0 24 24" width="21" height="21" fill="none" aria-hidden>
-        <circle cx="12" cy="12" r="4.2" stroke="currentColor" strokeWidth="1.9" />
-        <path
-          d="M12 2.6v2.2M12 19.2v2.2M21.4 12h-2.2M4.8 12H2.6M18.6 5.4l-1.6 1.6M7 17l-1.6 1.6M18.6 18.6 17 17M7 7 5.4 5.4"
-          stroke="currentColor"
-          strokeWidth="1.9"
-          strokeLinecap="round"
-        />
-      </svg>
-    </button>
-  );
 }
 
 export function TabBar() {
@@ -164,10 +121,10 @@ export function TabBar() {
             key={href}
             href={href}
             aria-current={active ? "page" : undefined}
-            className="flex flex-col items-center justify-center gap-1 py-2.5"
+            className="flex flex-col items-center justify-center gap-1.5 py-3"
             style={{
               color: active ? "var(--tsi-text)" : "var(--tsi-muted)",
-              minHeight: 56,
+              minHeight: 60,
             }}
           >
             <Icon />

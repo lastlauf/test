@@ -117,7 +117,7 @@ export default function Admin(props: Props) {
   const perSide = selectedRound?.format === "singles" ? 1 : 2;
 
   return (
-    <div className="space-y-4">
+    <div className="tsi-stack-tight">
       {error && (
         <Panel>
           <p className="font-bold" style={{ color: "var(--color-flag)" }}>

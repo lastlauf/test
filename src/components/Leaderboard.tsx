@@ -37,7 +37,7 @@ export default function Leaderboard({ initial }: { initial: BoardPayload }) {
   );
 
   return (
-    <div className="space-y-4">
+    <div className="tsi-stack-tight">
       <div className="relative grid grid-cols-3 tsi-rule rounded-xl p-1">
         <span
           aria-hidden
@@ -95,7 +95,7 @@ export default function Leaderboard({ initial }: { initial: BoardPayload }) {
           <table className="w-full border-collapse">
             <thead>
               <tr className="text-left text-[12px] tsi-muted">
-                <th className="px-4 py-2 font-medium">#</th>
+                <th className="px-5 py-3 font-medium">#</th>
                 <th className="py-2 font-medium">Player</th>
                 <th className="px-2 py-2 text-right font-medium">
                   {view === "gross" ? "Gross" : "Net"}
@@ -107,8 +107,8 @@ export default function Leaderboard({ initial }: { initial: BoardPayload }) {
             <tbody>
               {sorted.map((row, i) => (
                 <tr key={row.playerId} className="tsi-rule-t">
-                  <td className="tsi-num px-4 py-2.5 text-[15px] tsi-muted">{i + 1}</td>
-                  <td className="py-2.5">
+                  <td className="tsi-num px-5 py-3.5 text-[15px] tsi-muted">{i + 1}</td>
+                  <td className="py-3.5">
                     <Link
                       href={`/players/${row.username}`}
                       className="flex items-center gap-2"
@@ -117,20 +117,20 @@ export default function Leaderboard({ initial }: { initial: BoardPayload }) {
                       <span className="text-[15px] font-semibold">{row.displayName}</span>
                     </Link>
                   </td>
-                  <td className="tsi-num px-2 py-2.5 text-right text-[17px] font-bold">
+                  <td className="tsi-num px-2 py-3.5 text-right text-[17px] font-bold">
                     {toPar(view === "gross" ? row.toPar : row.netToPar, row.holesPlayed)}
                   </td>
-                  <td className="tsi-num px-2 py-2.5 text-right text-[15px]">
+                  <td className="tsi-num px-2 py-3.5 text-right text-[15px]">
                     {view === "gross" ? row.gross || "—" : row.net || "—"}
                   </td>
-                  <td className="tsi-num px-4 py-2.5 text-right text-[15px] tsi-muted">
+                  <td className="tsi-num px-5 py-3.5 text-right text-[15px] tsi-muted">
                     {row.holesPlayed}
                   </td>
                 </tr>
               ))}
               {sorted.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-4 py-6 text-center text-[15px] tsi-muted">
+                  <td colSpan={5} className="px-5 py-10 text-center text-[15px] tsi-muted">
                     No scores posted yet.
                   </td>
                 </tr>
@@ -143,15 +143,15 @@ export default function Leaderboard({ initial }: { initial: BoardPayload }) {
       {view === "matches" &&
         rounds.map(({ round, matches }) => (
           <section key={round.id}>
-            <div className="mb-2 flex items-baseline justify-between">
-              <h2 className="text-[17px] font-bold">{round.name}</h2>
+            <div className="mb-4 flex items-baseline justify-between">
+              <h2>{round.name}</h2>
               <span className="text-[13px] tsi-muted">{titleCase(round.format)}</span>
             </div>
             <Panel className="!p-0">
               <ul>
                 {matches.map((match, i) => (
                   <li key={match.id} className={i > 0 ? "tsi-rule-t" : ""}>
-                    <Link href={`/score/${match.id}`} className="block px-4 py-3">
+                    <Link href={`/score/${match.id}`} className="block px-5 py-4">
                       <span className="block truncate text-[15px] font-semibold">
                         {sideName(match.sides[0])}
                         <span className="tsi-muted"> v </span>
@@ -162,7 +162,7 @@ export default function Leaderboard({ initial }: { initial: BoardPayload }) {
                   </li>
                 ))}
                 {matches.length === 0 && (
-                  <li className="px-4 py-3 text-[15px] tsi-muted">No pairings yet.</li>
+                  <li className="px-5 py-4 text-[15px] tsi-muted">No pairings yet.</li>
                 )}
               </ul>
             </Panel>

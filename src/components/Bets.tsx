@@ -85,13 +85,13 @@ export default function Bets({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="tsi-stack-tight">
       <p className="text-[13px] tsi-muted">
         {online ? "Live" : "Offline"} · the ledger calculates balances only
       </p>
 
       <Panel>
-        <h2 className="mb-3 text-[17px] font-bold">Who owes whom</h2>
+        <h2 className="mb-4">Who owes whom</h2>
         {ledger.settlements.length === 0 ? (
           <p className="font-semibold tsi-muted">Nothing settled yet.</p>
         ) : (
@@ -167,7 +167,7 @@ export default function Bets({
 
       {canEdit && (
         <Panel className="space-y-3">
-          <h2 className="text-[17px] font-bold">Add a bet</h2>
+          <h2>Add a bet</h2>
           <div className="grid grid-cols-3 gap-1 rounded-xl tsi-rule p-1">
             {(["nassau", "skins", "h2h"] as WagerType[]).map((option) => (
               <button

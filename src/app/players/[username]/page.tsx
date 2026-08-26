@@ -53,7 +53,7 @@ export default async function PlayerProfilePage({
         }
       />
 
-      <div className="space-y-4">
+      <div className="tsi-stack-tight">
         <Panel className="flex items-center gap-4">
           <Avatar name={player.display_name} photo={player.photo} size={72} />
           <div className="min-w-0">
@@ -91,7 +91,7 @@ export default async function PlayerProfilePage({
         </div>
 
         <Panel>
-          <h2 className="mb-3 text-[17px] font-bold">By format</h2>
+          <h2 className="mb-4">By format</h2>
           <ul className="space-y-2">
             {(Object.keys(record.byFormat) as Format[]).map((format) => {
               const value = record.byFormat[format];
@@ -115,7 +115,7 @@ export default async function PlayerProfilePage({
         </Panel>
 
         <Panel>
-          <h2 className="mb-3 text-[17px] font-bold">Head to head</h2>
+          <h2 className="mb-4">Head to head</h2>
           <ul className="space-y-1">
             {record.headToHead.map((row) => (
               <li key={row.opponentId} className="flex items-center justify-between gap-3 py-1">
@@ -136,7 +136,7 @@ export default async function PlayerProfilePage({
 
         {record.partners.length > 0 && (
           <Panel>
-            <h2 className="mb-3 text-[17px] font-bold">Partners</h2>
+            <h2 className="mb-4">Partners</h2>
             <ul className="space-y-1">
               {record.partners.map((row) => (
                 <li key={row.playerId} className="flex items-center justify-between gap-3 py-1">

@@ -26,7 +26,7 @@ export default async function PlayersPage() {
                               >
                 <Link
                   href={`/players/${player.username}`}
-                  className="flex items-center gap-3 px-3 py-3"
+                  className="flex items-center gap-4 px-5 py-4"
                 >
                   <Avatar name={player.display_name} photo={player.photo} />
                   <span className="min-w-0 flex-1">
@@ -50,7 +50,7 @@ export default async function PlayersPage() {
             );
           })}
           {players.length === 0 && (
-            <li className="px-3 py-6 text-center font-semibold tsi-muted">
+            <li className="px-5 py-10 text-center text-[15px] tsi-muted">
               No players have signed up yet.
             </li>
           )}

@@ -86,7 +86,7 @@ export default function ProfileEditor({ player }: { player: Player }) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="tsi-stack-tight">
       <Panel className="space-y-4">
         <form onSubmit={save} className="space-y-3">
           <div className="flex items-center gap-4">

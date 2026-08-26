@@ -50,7 +50,8 @@ export interface TournamentRow {
 }
 export interface RoundRow {
   id: string;
-  tournament_id: string;
+  /** Null for a game someone started from the app rather than a scheduled round. */
+  tournament_id: string | null;
   name: string;
   format: Format;
   course_id: string;
@@ -59,7 +60,10 @@ export interface RoundRow {
   sequence: number;
   allowance: number;
   status: string;
+  /** Set when a player started this round as a game from the app. */
+  created_by: string | null;
 }
+
 export interface TeamRow {
   id: string;
   tournament_id: string;
@@ -227,7 +231,9 @@ export async function loadRounds(
 
   const courseIds = [...new Set(rounds.map((r) => r.course_id))];
   const teeIds = [...new Set(rounds.map((r) => r.tee_id).filter(Boolean))] as string[];
-  const tournamentIds = [...new Set(rounds.map((r) => r.tournament_id))];
+  const tournamentIds = [...new Set(rounds.map((r) => r.tournament_id))].filter(
+    (id): id is string => Boolean(id),
+  );
   const ids = rounds.map((r) => r.id);
 
   const [holeRows, teeRows, entryRows, matchRows] = await Promise.all([
@@ -239,10 +245,12 @@ export async function loadRounds(
     teeIds.length
       ? db().all<TeeRow>("SELECT * FROM tees WHERE id = ANY(?)", [teeIds])
       : Promise.resolve([] as TeeRow[]),
-    db().all<EntryView & { tournamentId: string }>(
-      `${ENTRY_SELECT} WHERE e.tournament_id = ANY(?) ORDER BY lower(p.display_name)`,
-      [tournamentIds],
-    ),
+    tournamentIds.length
+      ? db().all<EntryView & { tournamentId: string }>(
+          `${ENTRY_SELECT} WHERE e.tournament_id = ANY(?) ORDER BY lower(p.display_name)`,
+          [tournamentIds],
+        )
+      : Promise.resolve([] as (EntryView & { tournamentId: string })[]),
     db().all<{
       id: string;
       round_id: string;
@@ -346,7 +354,9 @@ export async function loadRounds(
     const holes = holesByCourse.get(round.course_id) ?? [];
     const par = holes.reduce((sum, h) => sum + h.par, 0);
     const tee = round.tee_id ? (teesById.get(round.tee_id) ?? null) : null;
-    const entries = entriesByTournament.get(round.tournament_id) ?? [];
+    const entries = round.tournament_id
+      ? (entriesByTournament.get(round.tournament_id) ?? [])
+      : [];
     const entryById = new Map(entries.map((e) => [e.playerId, e]));
     const allowance = round.allowance ?? DEFAULT_ALLOWANCE[round.format];
 

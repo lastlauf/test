@@ -255,7 +255,7 @@ export default function ScoreEntry({
   const myNet = myValue?.gross != null ? myValue.gross - myStrokes : null;
 
   return (
-    <div className="space-y-4">
+    <div className="tsi-stack-tight">
       <Panel className="!py-3">
         <p className="truncate text-[15px] font-semibold">
           {sideName(match.sides[0])} <span className="tsi-muted">v</span>{" "}
@@ -441,7 +441,7 @@ export default function ScoreEntry({
       {/* Everyone else — visible, never editable */}
       {others.length > 0 && (
         <section>
-          <div className="mb-2 flex items-baseline justify-between gap-2">
+          <div className="mb-4 flex items-baseline justify-between gap-2">
             <h2 className="text-[15px] font-semibold tsi-muted">
               {mine ? "Rest of the group" : "The group"}
             </h2>
@@ -519,7 +519,7 @@ function MiniCard({
 
   return (
     <Panel className="!p-0">
-      <h2 className="tsi-rule-b px-4 py-2.5 text-[15px] font-bold">Card</h2>
+      <h2 className="tsi-rule-b px-5 py-3.5 text-[16px] font-bold">Card</h2>
       <div className="tsi-scroll">
         <table className="w-full min-w-[640px] border-collapse text-center">
           <thead>

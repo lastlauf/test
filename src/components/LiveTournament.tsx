@@ -42,7 +42,7 @@ export default function LiveTournament({
     : undefined;
 
   return (
-    <div className="space-y-5">
+    <div className="tsi-stack">
       <p className="flex items-center justify-between gap-2 text-[13px] tsi-muted">
         <span>
           {online
@@ -84,15 +84,15 @@ export default function LiveTournament({
 
       {liveRound && (
         <section>
-          <div className="mb-2 flex items-baseline justify-between gap-2">
-            <h2 className="text-[17px] font-bold">{liveRound.round.name}</h2>
+          <div className="mb-4 flex items-baseline justify-between gap-2">
+            <h2>{liveRound.round.name}</h2>
             <span className="text-[13px] tsi-muted">{titleCase(liveRound.round.format)}</span>
           </div>
           <Panel className="!p-0">
             <ul>
               {liveRound.matches.map((match, i) => (
                 <li key={match.id} className={i > 0 ? "tsi-rule-t" : ""}>
-                  <Link href={`/score/${match.id}`} className="block px-4 py-3">
+                  <Link href={`/score/${match.id}`} className="block px-5 py-4">
                     <span className="block truncate text-[15px] font-semibold">
                       {sideName(match.sides[0])}
                       <span className="tsi-muted"> v </span>
@@ -106,7 +106,7 @@ export default function LiveTournament({
                 </li>
               ))}
               {liveRound.matches.length === 0 && (
-                <li className="px-4 py-3 text-[15px] tsi-muted">No pairings set yet.</li>
+                <li className="px-5 py-4 text-[15px] tsi-muted">No pairings set yet.</li>
               )}
             </ul>
           </Panel>
@@ -114,8 +114,8 @@ export default function LiveTournament({
       )}
 
       <section>
-        <div className="mb-2 flex items-baseline justify-between">
-          <h2 className="text-[17px] font-bold">Net leaderboard</h2>
+        <div className="mb-4 flex items-baseline justify-between">
+          <h2>Net leaderboard</h2>
           <Link
             href={`/leaderboard?t=${tournament.id}`}
             className="text-[13px] font-semibold tsi-muted"
@@ -147,7 +147,7 @@ export default function LiveTournament({
               </li>
             ))}
             {leaderboard.length === 0 && (
-              <li className="px-4 py-3 text-[15px] tsi-muted">No scores posted yet.</li>
+              <li className="px-5 py-4 text-[15px] tsi-muted">No scores posted yet.</li>
             )}
           </ol>
         </Panel>

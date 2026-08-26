@@ -43,7 +43,7 @@ export default async function ArchiveYearPage({
         }
       />
 
-      <div className="space-y-4">
+      <div className="tsi-stack-tight">
         <Panel className="flex flex-wrap items-center gap-3">
           {teams.map((team) => (
             <span key={team.teamId} className="flex items-center gap-2">
