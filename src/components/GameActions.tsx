@@ -42,7 +42,7 @@ export default function GameActions({ roundId }: { roundId: string }) {
           busyLabel="Archiving…"
           onConfirm={() =>
             call(`/api/games/${roundId}/archive`, "POST", () => {
-              router.push("/archive");
+              router.push("/cup");
               router.refresh();
             })
           }

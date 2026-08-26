@@ -119,6 +119,50 @@ h3 {
   }
 
   /*
+   * Record-book tables. A phone can't show eight columns at once, so the table
+   * scrolls sideways inside its own panel rather than stretching the page.
+   */
+  .tsi-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tsi-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+    white-space: nowrap;
+  }
+  .tsi-table th,
+  .tsi-table td {
+    padding: 12px 14px;
+    text-align: left;
+  }
+  .tsi-table thead th {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--tsi-muted);
+    border-bottom: var(--tsi-rule) solid var(--tsi-line);
+  }
+  .tsi-table tbody tr + tr td {
+    border-top: 1px solid var(--tsi-line);
+  }
+  .tsi-table .tsi-col-num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-weight: 650;
+  }
+  .tsi-table th.tsi-col-num {
+    text-align: right;
+  }
+  /* The one column that has to stay readable while the rest scrolls past. */
+  .tsi-table .tsi-col-lead {
+    white-space: normal;
+    min-width: 11rem;
+  }
+
+  /*
    * Tab bar. A phone gets a full-width bar pinned to the bottom edge; from
    * tablet up it floats free as a pill only as wide as its five tabs, so a
    * desktop window doesn't get a navigation bar stretched across a metre of

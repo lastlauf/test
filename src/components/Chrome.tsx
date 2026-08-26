@@ -69,7 +69,7 @@ function IconPlayers() {
   );
 }
 
-function IconArchive() {
+function IconCup() {
   return (
     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden>
       <path
@@ -93,13 +93,19 @@ const TABS = [
   { href: "/games", label: "Games", Icon: IconScore },
   { href: "/bets", label: "Bets", Icon: IconBets },
   { href: "/players", label: "Players", Icon: IconPlayers },
-  { href: "/archive", label: "Archive", Icon: IconArchive },
+  { href: "/cup", label: "Cup", Icon: IconCup },
 ];
 
 function isActive(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
   // Scorecards live under /score but belong to the Games tab.
   if (href === "/games") return pathname.startsWith("/games") || pathname.startsWith("/score");
+  // Tournaments, rounds, stats and courses are all one section behind one tab.
+  if (href === "/cup") {
+    return ["/cup", "/rounds", "/stats", "/courses", "/archive"].some(
+      (root) => pathname === root || pathname.startsWith(`${root}/`),
+    );
+  }
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 

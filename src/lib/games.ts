@@ -12,7 +12,7 @@ import type { RoundRow } from "./tsi";
 export { BET_GUIDES, FORMAT_GUIDES, sideCapacity } from "./game-guides";
 export type { FormatGuide } from "./game-guides";
 
-const STANDARD_HOLES: [number, number, number][] = [
+export const STANDARD_HOLES: [number, number, number][] = [
   [1, 4, 7], [2, 5, 13], [3, 4, 1], [4, 3, 17], [5, 4, 5], [6, 4, 11],
   [7, 3, 15], [8, 5, 9], [9, 4, 3], [10, 4, 8], [11, 5, 14], [12, 3, 18],
   [13, 4, 2], [14, 4, 10], [15, 4, 6], [16, 3, 16], [17, 5, 12], [18, 4, 4],
