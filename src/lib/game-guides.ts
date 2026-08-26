@@ -76,6 +76,15 @@ export const FORMAT_GUIDES: FormatGuide[] = [
 
 export const BET_GUIDES = [
   {
+    name: "Match",
+    summary: "The simplest bet there is: one stake on who wins the match outright.",
+    rules: [
+      "Settles off the match result, so a 3&2 win pays exactly what a 1 up win pays.",
+      "A halved match pays nobody.",
+      "In a fourball or foursomes the stake splits across the winning side.",
+    ],
+  },
+  {
     name: "Nassau",
     summary: "Three bets in one: the front nine, the back nine, and the full 18.",
     rules: [
