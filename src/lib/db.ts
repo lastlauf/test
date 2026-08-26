@@ -7,16 +7,39 @@ import { Pool, type PoolClient } from "pg";
 
 let instance: Pool | null = null;
 
+/**
+ * Connection string sources, in order. DATABASE_URL is what this app
+ * documents, but the hosted-Postgres integrations on most platforms inject
+ * their own names — Vercel's Supabase and Neon integrations set POSTGRES_URL —
+ * so a database attached through a marketplace integration works without
+ * anyone having to copy a second copy of the same credential.
+ */
+const CONNECTION_VARS = [
+  "DATABASE_URL",
+  "POSTGRES_URL",
+  "POSTGRES_URL_NON_POOLING",
+  "POSTGRES_PRISMA_URL",
+  "DATABASE_POSTGRES_URL",
+  "SUPABASE_DB_URL",
+];
+
 function connectionString(): string {
-  const url = process.env.DATABASE_URL;
-  if (!url) {
-    throw new Error(
-      "DATABASE_URL is not set. In development, copy .env.example to .env.local; " +
-        "on a deployment, set it in the platform's environment variables and redeploy — " +
-        "a build started before the variable existed will not pick it up.",
-    );
+  for (const name of CONNECTION_VARS) {
+    const value = process.env[name]?.trim();
+    if (value) return value;
   }
-  return url;
+  // Name the database-ish variables that do exist, so a misnamed or
+  // wrong-environment variable is obvious. Names only — never values.
+  const present = Object.keys(process.env)
+    .filter((key) => /postgres|database|supabase/i.test(key))
+    .sort();
+  throw new Error(
+    `No Postgres connection string found. Looked for ${CONNECTION_VARS.join(", ")}. ` +
+      `Database-related variables visible to this process: ${present.length ? present.join(", ") : "none"}. ` +
+      "In development, copy .env.example to .env.local. On a deployment, set the " +
+      "variable for the Production environment and redeploy — a build started " +
+      "before the variable existed will not pick it up.",
+  );
 }
 
 export function pool(): Pool {
