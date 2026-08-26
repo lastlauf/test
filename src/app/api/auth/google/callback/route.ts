@@ -8,6 +8,7 @@ import {
   getPlayer,
   googleEnabled,
   setSessionCookie,
+  uniqueUsername,
 } from "@/lib/auth";
 import { fail } from "@/lib/api";
 import { OAUTH_STATE_COOKIE } from "../route";
@@ -27,19 +28,6 @@ function decodeIdToken(idToken: string): GoogleClaims | null {
   } catch {
     return null;
   }
-}
-
-/** Turn an email or display name into a free TSI username. */
-async function pickUsername(seed: string): Promise<string> {
-  const base = seed.split("@")[0].replace(/[^a-zA-Z0-9_.-]/g, "").slice(0, 20) || "golfer";
-  let candidate = base.length >= 3 ? base : `${base}tsi`;
-  let n = 1;
-  while (
-    await db().one("SELECT 1 FROM players WHERE lower(username) = lower(?)", [candidate])
-  ) {
-    candidate = `${base}${n++}`;
-  }
-  return candidate;
 }
 
 export async function GET(request: Request) {
@@ -88,7 +76,7 @@ export async function GET(request: Request) {
   }
   if (!playerId) {
     const player = await createPlayer({
-      username: await pickUsername(claims.email ?? claims.name ?? "golfer"),
+      username: await uniqueUsername(claims.email ?? claims.name ?? "golfer"),
       displayName: claims.name ?? claims.email ?? "New Player",
       email: claims.email ?? null,
       googleSub: claims.sub,

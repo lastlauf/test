@@ -27,6 +27,12 @@
   --tsi-panel: var(--color-paper-soft);
   --tsi-line: var(--color-line);
   --tsi-weight: 600;
+  /* Hard offset used instead of blur so depth survives sunlight mode. */
+  --tsi-sticker: var(--color-turkey);
+
+  --ease-expo-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-snap: cubic-bezier(0.87, 0, 0.13, 1);
 }
 
 /* Sunlight mode: pure black on pure white, heavier type, thicker rules. */
@@ -37,6 +43,7 @@
   --tsi-panel: #ffffff;
   --tsi-line: #000000;
   --tsi-weight: 800;
+  --tsi-sticker: #000000;
 }
 
 html {
@@ -110,6 +117,16 @@ body {
     font-size: 17px;
     font-weight: 600;
   }
+  .tsi-field::placeholder {
+    color: var(--tsi-muted);
+    opacity: 0.75;
+    font-weight: 500;
+  }
+  :root[data-sun="on"] .tsi-field::placeholder {
+    color: #3a3a3a;
+    opacity: 1;
+    font-weight: 600;
+  }
   .tsi-label {
     display: block;
     font-size: 13px;
@@ -136,4 +153,51 @@ body {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/*
+ * Auth screen: a hard-edged scoreboard sticker. Depth comes from a solid
+ * offset block rather than a blur, which keeps the edges readable in direct
+ * sun, and the panel enters in sequence so the eye lands on the bird first.
+ */
+.tsi-sticker {
+  position: relative;
+  box-shadow: 6px 6px 0 0 var(--tsi-sticker);
+}
+
+@keyframes tsi-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes tsi-strut {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0) rotate(-6deg);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(-3deg);
+  }
+}
+
+.tsi-enter {
+  animation: tsi-rise 520ms var(--ease-expo-out) both;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+
+.tsi-enter-bird {
+  animation: tsi-strut 620ms var(--ease-spring) both;
+  transform: rotate(-3deg);
+}
+
+/* Tab underline slides between the two auth modes. */
+.tsi-segment-thumb {
+  transition: transform 260ms var(--ease-snap);
 }

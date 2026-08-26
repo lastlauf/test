@@ -16,8 +16,10 @@ CREATE TABLE IF NOT EXISTS players (
   is_admin       smallint NOT NULL DEFAULT 0,
   created_at     timestamptz NOT NULL DEFAULT now()
 );
--- Usernames are compared case-insensitively.
+-- Usernames and emails are both compared case-insensitively. Accounts created
+-- through Google may have no password; accounts created with an email have one.
 CREATE UNIQUE INDEX IF NOT EXISTS players_username_key ON players (lower(username));
+CREATE UNIQUE INDEX IF NOT EXISTS players_email_key ON players (lower(email));
 
 CREATE TABLE IF NOT EXISTS sessions (
   token      text PRIMARY KEY,

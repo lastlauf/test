@@ -1,37 +1,43 @@
 import {
   createPlayer,
   createSession,
-  findPlayerByUsername,
+  findPlayerByEmail,
   setSessionCookie,
-  validateUsername,
+  uniqueUsername,
+  validateEmail,
 } from "@/lib/auth";
 import { fail, json, readJson } from "@/lib/api";
 
 interface Body {
-  username: string;
   displayName: string;
+  email: string;
   password: string;
   handicapIndex?: number;
-  ghin?: string;
 }
 
 export async function POST(request: Request) {
   const body = await readJson<Body>(request);
-  const username = (body.username ?? "").trim();
-  const displayName = (body.displayName ?? "").trim() || username;
-  const invalid = validateUsername(username);
-  if (invalid) return fail(invalid);
+  const displayName = (body.displayName ?? "").trim();
+  const email = (body.email ?? "").trim();
+
+  if (displayName.length < 2) return fail("Tell us your name.");
+  const badEmail = validateEmail(email);
+  if (badEmail) return fail(badEmail);
   if (!body.password || body.password.length < 8) {
     return fail("Password must be at least 8 characters.");
   }
-  if (await findPlayerByUsername(username)) return fail("That username is taken.", 409);
+  if (await findPlayerByEmail(email)) {
+    return fail("There is already an account on that email — sign in instead.", 409);
+  }
 
   const player = await createPlayer({
-    username,
+    // The username is the profile's public handle; derive it so signing up only
+    // ever asks for a name, an email and a password.
+    username: await uniqueUsername(email),
     displayName,
+    email,
     password: body.password,
     handicapIndex: Number.isFinite(body.handicapIndex) ? Number(body.handicapIndex) : 18,
-    ghin: body.ghin?.trim() || null,
   });
   const { token, expires } = await createSession(player.id);
   await setSessionCookie(token, expires);

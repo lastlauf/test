@@ -96,6 +96,39 @@ export async function findPlayerByUsername(
   );
 }
 
+/** Sign-in accepts either the email on the account or the TSI username. */
+export async function findPlayerByLogin(
+  identifier: string,
+): Promise<(Player & { password_hash: string | null }) | null> {
+  return db().one<Player & { password_hash: string | null }>(
+    `SELECT ${PLAYER_COLUMNS}, password_hash FROM players
+     WHERE lower(username) = lower(?) OR lower(email) = lower(?)`,
+    [identifier, identifier],
+  );
+}
+
+export async function findPlayerByEmail(email: string): Promise<Player | null> {
+  return db().one<Player>(
+    `SELECT ${PLAYER_COLUMNS} FROM players WHERE lower(email) = lower(?)`,
+    [email],
+  );
+}
+
+/** Derives a free TSI username from an email address or a display name. */
+export async function uniqueUsername(seed: string): Promise<string> {
+  const base =
+    seed.split("@")[0].replace(/[^a-zA-Z0-9_.-]/g, "").slice(0, 20).toLowerCase() ||
+    "golfer";
+  let candidate = base.length >= 3 ? base : `${base}tsi`;
+  let n = 1;
+  while (
+    await db().one("SELECT 1 FROM players WHERE lower(username) = lower(?)", [candidate])
+  ) {
+    candidate = `${base}${n++}`;
+  }
+  return candidate;
+}
+
 export async function getPlayer(id: string): Promise<Player | null> {
   return db().one<Player>(`SELECT ${PLAYER_COLUMNS} FROM players WHERE id = ?`, [id]);
 }
@@ -155,6 +188,13 @@ export function appOrigin(): string {
       ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
       : "http://localhost:3000")
   );
+}
+
+export function validateEmail(email: string): string | null {
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+    return "That doesn't look like an email address.";
+  }
+  return null;
 }
 
 export function validateUsername(username: string): string | null {
