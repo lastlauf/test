@@ -100,36 +100,3 @@ export function TurkeyMark({
     </svg>
   );
 }
-
-/**
- * The compact mark: a golf ball with three tail feathers behind it. Built to
- * stay legible at 24px in a header, where the full bird turns to mush.
- */
-export function LogoMark({ size = 30 }: { size?: number }) {
-  return (
-    <svg
-      viewBox="0 0 32 32"
-      width={size}
-      height={size}
-      aria-hidden
-      focusable="false"
-      style={{ color: "var(--tsi-text)" }}
-    >
-      <g stroke="currentColor" strokeWidth="1.9" strokeLinejoin="round">
-        {[-38, 0, 38].map((angle, i) => (
-          <rect
-            key={angle}
-            x="13.2"
-            y="2"
-            width="5.6"
-            height="17"
-            rx="2.8"
-            transform={`rotate(${angle} 16 20)`}
-            fill={i === 1 ? "var(--color-fairway)" : "var(--tsi-accent)"}
-          />
-        ))}
-        <circle cx="16" cy="21.5" r="9.2" fill="#fff" />
-      </g>
-    </svg>
-  );
-}

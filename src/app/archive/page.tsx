@@ -40,7 +40,7 @@ export default async function ArchivePage() {
 
   return (
     <>
-      <PageTitle kicker="The original app" title="Archive" />
+      <PageTitle title="Archive" />
 
       <div className="tsi-stack">
         <section>

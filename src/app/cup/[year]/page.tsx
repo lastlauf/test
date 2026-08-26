@@ -26,7 +26,6 @@ export default async function CupYearPage({
   return (
     <>
       <PageTitle
-        kicker={tournament.status === "complete" ? "Final" : "Leaderboard"}
         title={tournament.name}
         action={
           <Link href="/cup" className="text-[14px] font-semibold underline">

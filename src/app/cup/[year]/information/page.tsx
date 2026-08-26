@@ -36,8 +36,7 @@ export default async function CupInformationPage({
   return (
     <>
       <PageTitle
-        kicker={`${tournament.year} · Information`}
-        title="How it works"
+        title={`${tournament.year} format`}
         action={
           <Link href="/cup" className="text-[14px] font-semibold underline">
             All years

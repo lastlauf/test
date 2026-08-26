@@ -26,7 +26,7 @@ export default async function BetsPage({
   if (!tournament) {
     return (
       <>
-        <PageTitle kicker="Side action" title="Bets" />
+        <PageTitle title="Bets" />
         <Empty>No tournament to bet on yet.</Empty>
       </>
     );
@@ -40,7 +40,7 @@ export default async function BetsPage({
   if (!round) {
     return (
       <>
-        <PageTitle kicker="Side action" title="Bets" />
+        <PageTitle title="Bets" />
         <Empty>No rounds scheduled yet.</Empty>
       </>
     );
@@ -66,7 +66,7 @@ export default async function BetsPage({
 
   return (
     <>
-      <PageTitle kicker="Side action" title="Bets & ledger" />
+      <PageTitle title="Bets & ledger" />
       {rounds.length > 1 && (
         <Scroller className="mb-4 -mx-1" innerClassName="px-1">
           <div className="flex gap-2 pb-1">

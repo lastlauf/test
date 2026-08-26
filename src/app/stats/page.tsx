@@ -10,7 +10,7 @@ export default async function StatsPage() {
 
   return (
     <>
-      <PageTitle kicker="Record book" title="Stats" />
+      <PageTitle title="Stats" />
 
       <div className="tsi-stack">
         <section>

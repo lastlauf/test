@@ -14,7 +14,7 @@ export default async function PlayersPage() {
 
   return (
     <>
-      <PageTitle kicker="Roster" title="Players" />
+      <PageTitle title="Players" />
       <Panel className="!p-0">
         <ul>
           {players.map(({ player, record }) => {

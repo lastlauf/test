@@ -14,7 +14,7 @@ export default async function LeaderboardPage({
   if (!tournament) {
     return (
       <>
-        <PageTitle kicker="Leaderboard" title="No tournament" />
+        <PageTitle title="No tournament" />
         <Empty>Nothing has been played yet.</Empty>
       </>
     );
@@ -22,7 +22,7 @@ export default async function LeaderboardPage({
 
   return (
     <>
-      <PageTitle kicker="Leaderboard" title={tournament.name} />
+      <PageTitle title={tournament.name} />
       <Leaderboard initial={await buildBoard(tournament)} />
     </>
   );

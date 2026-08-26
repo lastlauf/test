@@ -10,7 +10,7 @@ export default async function NewCoursePage() {
 
   return (
     <>
-      <PageTitle kicker="Courses" title="Add a course" />
+      <PageTitle title="Add a course" />
       <Panel>
         <CourseForm />
       </Panel>

@@ -29,8 +29,7 @@ export default async function ScoreMatchPage({
   return (
     <>
       <PageTitle
-        kicker={bundle.round.name}
-        title={match.name}
+        title={`${bundle.round.name} · ${match.name}`}
         action={
           <Link href="/score" className="text-[14px] font-semibold">
             All matches

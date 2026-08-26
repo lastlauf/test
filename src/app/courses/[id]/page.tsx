@@ -20,7 +20,6 @@ export default async function CoursePage({
   return (
     <>
       <PageTitle
-        kicker="Course"
         title={detail.course.name}
         action={
           player ? (

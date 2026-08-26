@@ -12,7 +12,6 @@ export default async function CoursesPage() {
   return (
     <>
       <PageTitle
-        kicker="Record book"
         title="Courses"
         action={
           player ? (

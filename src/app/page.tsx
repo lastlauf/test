@@ -1,6 +1,8 @@
 import Link from "next/link";
+import { Avatar } from "@/components/Avatar";
 import { CupScoreboard, SessionBlock } from "@/components/Cup";
 import { Panel } from "@/components/ui";
+import { currentPlayer } from "@/lib/auth";
 import { cupStandings, pointsToWin, tournamentSessions } from "@/lib/cup";
 import { activeTournament, listTournaments } from "@/lib/tsi";
 
@@ -30,6 +32,10 @@ const SECTIONS = [
 ];
 
 export default async function HomePage() {
+  // With the header bar gone, this is the only way to your account, so it has
+  // to be here whether or not you are signed in.
+  const player = await currentPlayer();
+
   // The cup being played, or the most recent one if nothing is live.
   const active = await activeTournament();
   const tournament = active ?? (await listTournaments())[0] ?? null;
@@ -46,10 +52,26 @@ export default async function HomePage() {
   return (
     <>
       <div className="mb-8">
-        <p className="mb-1.5 text-[13px] font-semibold tsi-muted">
-          Turkey Slice Invitational
-        </p>
-        <h1>The record book</h1>
+        <div className="flex items-start justify-between gap-4">
+          <h1 className="min-w-0">Turkey Slice Invitational</h1>
+          {player ? (
+            <Link
+              href="/me"
+              className="tsi-tap flex shrink-0 items-center justify-center"
+              aria-label={`Your account, signed in as ${player.display_name}`}
+            >
+              <Avatar name={player.display_name} photo={player.photo} size={44} />
+            </Link>
+          ) : (
+            <Link
+              href="/login"
+              className="tsi-rule inline-flex shrink-0 items-center rounded-full px-4 text-[14px] font-semibold"
+              style={{ minHeight: 44 }}
+            >
+              Sign in
+            </Link>
+          )}
+        </div>
         <p className="mt-3 max-w-[34rem] text-[16px] tsi-muted">
           Every cup, every session, every card and what it did to your record.
         </p>

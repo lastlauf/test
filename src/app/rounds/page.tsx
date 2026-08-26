@@ -9,7 +9,7 @@ export default async function RoundsPage() {
 
   return (
     <>
-      <PageTitle kicker="Record book" title="Rounds" />
+      <PageTitle title="Rounds" />
 
       <div className="tsi-stack">
         <section>

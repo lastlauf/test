@@ -40,8 +40,9 @@ export default async function GamePage({
   return (
     <>
       <PageTitle
-        kicker={game.round.status === "archived" ? "Archived game" : "Game"}
-        title={guide?.name ?? game.round.name}
+        title={`${guide?.name ?? game.round.name}${
+          game.round.status === "archived" ? " (archived)" : ""
+        }`}
         action={
           <Link href="/games" className="text-[14px] font-semibold tsi-muted">
             All games

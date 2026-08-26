@@ -43,8 +43,7 @@ export default async function CupPlayersPage({
   return (
     <>
       <PageTitle
-        kicker={`${tournament.year} · Roster`}
-        title="Players"
+        title={`${tournament.year} roster`}
         action={
           <Link href="/cup" className="text-[14px] font-semibold underline">
             All years

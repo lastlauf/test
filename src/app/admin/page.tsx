@@ -27,7 +27,7 @@ export default async function AdminPage({
   if (player.is_admin !== 1) {
     return (
       <>
-        <PageTitle kicker="Admin" title="Not your job" />
+        <PageTitle title="Not your job" />
         <Empty>
           Only a TSI admin can set up tournaments. The first account created on this
           deployment is the admin.
@@ -58,7 +58,7 @@ export default async function AdminPage({
 
   return (
     <>
-      <PageTitle kicker="Admin" title="Tournament setup" />
+      <PageTitle title="Tournament setup" />
       <Admin
         players={players}
         courses={courses}

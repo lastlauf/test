@@ -20,7 +20,7 @@ export default async function EditCoursePage({
 
   return (
     <>
-      <PageTitle kicker="Courses" title={`Edit ${detail.course.name}`} />
+      <PageTitle title={`Edit ${detail.course.name}`} />
       <Panel>
         <CourseForm
           courseId={id}

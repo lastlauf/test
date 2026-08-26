@@ -17,7 +17,7 @@ export default async function CupPage() {
 
   return (
     <>
-      <PageTitle kicker="Record book" title="Tournaments" />
+      <PageTitle title="Tournaments" />
 
       <div className="tsi-stack">
         <section>

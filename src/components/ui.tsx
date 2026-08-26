@@ -2,22 +2,15 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 export function PageTitle({
-  kicker,
   title,
   action,
 }: {
-  kicker?: string;
   title: string;
   action?: ReactNode;
 }) {
   return (
     <div className="mb-8 flex items-end justify-between gap-4">
-      <div className="min-w-0">
-        {kicker && (
-          <p className="mb-1.5 text-[13px] font-semibold tsi-muted">{kicker}</p>
-        )}
-        <h1>{title}</h1>
-      </div>
+      <h1 className="min-w-0">{title}</h1>
       {action}
     </div>
   );

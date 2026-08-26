@@ -42,7 +42,6 @@ export default async function PlayerProfilePage({
   return (
     <>
       <PageTitle
-        kicker="Player"
         title={player.display_name}
         action={
           me?.id === player.id ? (

@@ -9,7 +9,7 @@ export default async function GamesPage() {
   const [player, games] = await Promise.all([currentPlayer(), listOpenGames()]);
   return (
     <>
-      <PageTitle kicker="Play" title="Games" />
+      <PageTitle title="Games" />
       <Games games={games} myPlayerId={player?.id ?? null} />
     </>
   );

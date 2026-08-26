@@ -13,7 +13,6 @@ export default async function MePage() {
   return (
     <>
       <PageTitle
-        kicker="Your account"
         title={player.display_name}
         action={
           <Link href={`/players/${player.username}`} className="text-[14px] font-semibold">
