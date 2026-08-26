@@ -28,8 +28,19 @@ function connectionString(): string {
     const value = process.env[name]?.trim();
     if (value) return value;
   }
-  // Name the database-ish variables that do exist, so a misnamed or
-  // wrong-environment variable is obvious. Names only — never values.
+  // A variable that exists but holds an empty string is a different bug from
+  // one that was never set, and the two are easy to confuse in a hosting
+  // dashboard. Report them separately. Names only — never values.
+  const empty = CONNECTION_VARS.filter(
+    (name) => name in process.env && !process.env[name]?.trim(),
+  );
+  if (empty.length) {
+    throw new Error(
+      `${empty.join(", ")} ${empty.length === 1 ? "is" : "are"} set but empty. ` +
+        "The variable exists with a blank value — re-enter the connection string " +
+        "in the platform's environment variables and redeploy.",
+    );
+  }
   const present = Object.keys(process.env)
     .filter((key) => /postgres|database|supabase/i.test(key))
     .sort();
